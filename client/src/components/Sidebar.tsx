@@ -1,6 +1,6 @@
 export default function Sidebar() {
   return (
-    <div className="bg-white flex flex-col w-1/6 h-[100vh]">
+    <div className="bg-yellow-100 flex flex-col w-1/6 ">
       This is a simple sidebar
     </div>
   );
