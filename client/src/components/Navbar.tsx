@@ -3,7 +3,6 @@ import logo from "../assets/img/Logo.svg";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import { DialogContent } from "@mui/material";
-import TransactionForm from "./TransactionForm";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -22,9 +21,7 @@ export default function Navbar() {
         Add
       </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogContent>
-          <TransactionForm></TransactionForm>
-        </DialogContent>
+        <DialogContent></DialogContent>
       </Dialog>
     </div>
   );
