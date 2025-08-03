@@ -23,7 +23,6 @@ export default function Navbar() {
       </Button>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>
-          {" "}
           <TransactionForm></TransactionForm>
         </DialogContent>
       </Dialog>
