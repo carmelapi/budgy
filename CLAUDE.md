@@ -17,6 +17,7 @@ Junior frontend developer learning full-stack development:
 4. Add comments in code for complex parts
 5. Warn me about common beginner mistakes
 6. Don't make verbose code
+7. Start always with plan mode on
 
 ---
 
