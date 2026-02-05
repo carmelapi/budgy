@@ -1,71 +1,183 @@
-import { Button, FormControl, FormLabel } from "@mui/material";
+import { Button, FormControl, FormLabel, Alert } from "@mui/material";
 import Input from "@mui/material/Input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [localError, setLocalError] = useState<string | null>(null);
+
   const navigate = useNavigate();
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { login, signup, isAuthenticated, isLoading, error } = useAuth();
 
-  const handleSignUp = async () => {
+  /**
+   * If user is already authenticated, redirect to dashboard
+   * This prevents logged-in users from seeing the login page
+   */
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  /**
+   * Handle login button click
+   */
+  const handleLogin = async () => {
+    setLocalError(null);
+
+    // Basic validation
+    if (!email || !password) {
+      setLocalError("Please enter both email and password");
+      return;
+    }
+
     try {
-      const response = await fetch(`${apiUrl}/api/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        navigate("/dashboard");
-      } else {
-        console.error("Hey! There is an error in your sign up:", data.message);
-      }
-    } catch (error) {
-      console.error("Error during sign up:", error);
+      await login(email, password);
+      // Navigation happens automatically via useEffect when isAuthenticated changes
+    } catch (err) {
+      // Error is already set in AuthContext, but we can add local handling if needed
+      console.error("Login failed:", err);
     }
   };
 
+  /**
+   * Handle signup button click
+   */
+  const handleSignUp = async () => {
+    setLocalError(null);
+
+    // Basic validation
+    if (!email || !password) {
+      setLocalError("Please enter both email and password");
+      return;
+    }
+
+    if (password.length < 6) {
+      setLocalError("Password must be at least 6 characters");
+      return;
+    }
+
+    try {
+      await signup(email, password);
+      // Navigation happens automatically via useEffect when isAuthenticated changes
+    } catch (err) {
+      // Error is already set in AuthContext
+      console.error("Signup failed:", err);
+    }
+  };
+
+  /**
+   * Handle Enter key press to submit form
+   * Using onKeyDown instead of deprecated onKeyPress
+   */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      mode === "login" ? handleLogin() : handleSignUp();
+    }
+  };
+
+  /**
+   * Toggle between login and signup modes
+   */
+  const toggleMode = () => {
+    setMode(mode === "login" ? "signup" : "login");
+    setLocalError(null); // Clear errors when switching modes
+  };
+
+  // Display error from AuthContext or local error
+  const displayError = error || localError;
+
   return (
-    <>
-      <div className="flex flex-col w-full h-screen justify-center items-center ">
-        <div className="flex flex-col justify-center items-center gap-12 bg-white rounded-lg shadow-md w-96 h-96">
-          <FormControl>
-            <FormLabel>
-              <Input
-                name="email"
-                type="text"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </FormLabel>
-          </FormControl>
+    <div className="flex flex-col w-full h-screen justify-center items-center bg-gray-50">
+      <div className="flex flex-col justify-center items-center gap-6 bg-white rounded-lg shadow-md w-96 p-8">
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-gray-800">
+          {mode === "login" ? "Welcome Back" : "Create Account"}
+        </h1>
 
-          <FormControl>
-            <FormLabel>
-              <Input
-                name="password"
-                type="password"
-                placeholder="Your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </FormLabel>
-          </FormControl>
+        {/* Error message */}
+        {displayError && (
+          <Alert severity="error" className="w-full">
+            {displayError}
+          </Alert>
+        )}
 
-          <div className="flex flex-row gap-4">
-            <Button variant="outlined" id="signin" onClick={handleSignUp}>
-              Sign up
-            </Button>
-          </div>
+        {/* Email input */}
+        <FormControl className="w-full">
+          <FormLabel>Email</FormLabel>
+          <Input
+            name="email"
+            type="email"
+            placeholder="your@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+            fullWidth
+          />
+        </FormControl>
+
+        {/* Password input */}
+        <FormControl className="w-full">
+          <FormLabel>Password</FormLabel>
+          <Input
+            name="password"
+            type="password"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isLoading}
+            fullWidth
+          />
+        </FormControl>
+
+        {/* Submit button */}
+        <Button
+          variant="contained"
+          onClick={mode === "login" ? handleLogin : handleSignUp}
+          disabled={isLoading}
+          fullWidth
+          className="mt-2"
+        >
+          {isLoading
+            ? "Please wait..."
+            : mode === "login"
+            ? "Login"
+            : "Sign Up"}
+        </Button>
+
+        {/* Mode toggle */}
+        <div className="text-sm text-gray-600">
+          {mode === "login" ? (
+            <>
+              Don't have an account?{" "}
+              <button
+                onClick={toggleMode}
+                className="text-blue-600 hover:underline font-medium"
+                disabled={isLoading}
+              >
+                Sign up
+              </button>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <button
+                onClick={toggleMode}
+                className="text-blue-600 hover:underline font-medium"
+                disabled={isLoading}
+              >
+                Login
+              </button>
+            </>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 }
