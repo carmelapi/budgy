@@ -46,6 +46,10 @@ This is the most important rule. **Never work on frontend and backend at the sam
 ```
 CORRECT FLOW:
 
+0. 🌿 CREATE BRANCH FIRST (before anything else!):
+   git checkout main && git pull origin main
+   git checkout -b feature/nome-feature
+
 1. Claude implements backend completely (all routes, controllers, DB changes)
 2. Claude says: "✅ Backend done. Files modified: [list]. Ready for you to test."
 3. I test the backend (Postman, curl, etc.)
@@ -70,13 +74,23 @@ CORRECT FLOW:
 
 ## Development Workflow
 
-1. Pull latest: `git checkout main && git pull origin main`
-2. Create branch: `git checkout -b feature/feature-name`
-3. Ask Claude to explain the plan first
-4. Backend phase → I test → I commit/push
-5. Frontend phase (page by page) → I test → I commit/push
-6. When all pages done: I create PR on GitHub
-7. After merge: I deploy to Hetzner
+> 🚨 **Golden Rule**: Create the branch **FIRST** of all — before planning, before coding, before asking Claude.
+
+```bash
+# ✅ ALWAYS first thing
+git checkout main
+git pull origin main
+git checkout -b feature/nome-feature
+```
+
+1. **First of all**: Create the branch (see above)
+2. Then ask Claude to explain the plan
+3. Backend phase → Tests → Commit/push
+4. Frontend phase (page by page) → Tests → Commit/push
+5. When all pages are done: Create PR on GitHub
+6. After merge: Deploy to Hetzner
+
+> ⚠️ **Common junior mistake**: starting work on `main` and only realizing it later. If you forget, you can fix it with `git checkout -b feature/name` even halfway through (unpushed commits will move to the new branch).
 
 ---
 
@@ -120,4 +134,4 @@ pm2 monit               # Real-time dashboard
 - **API calls failing**: Check `VITE_API_URL` in `.env`
 - **DB connection fails**: Check PostgreSQL is running + `.env` credentials
 - **CORS errors**: Check CORS middleware in `server.js`
-- **PM2 crashes**: `pm2 logs budgy-api`
+- **PM2 crashes**: `pm2 logs budgy-api`# CLAUDE.md — Budgy Project Overview

@@ -2,6 +2,8 @@
 
 > ⬅️ Back to main: [`CLAUDE.md`](./CLAUDE.md)
 
+> 🌿 **Reminder**: Have you created the branch yet? `git checkout -b feature/feature-name` — do that before you start!
+
 ---
 
 ## Tech Stack
