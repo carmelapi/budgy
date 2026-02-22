@@ -98,8 +98,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setToken(authData.token);
       setUser(authData.user);
       setIsAuthenticated(true);
-
-      console.log("Login successful:", authData.user.email);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed";
       setError(errorMessage);
@@ -114,7 +112,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
    * Signup function
    * Calls /api/signup endpoint and stores token in localStorage
    */
-  const signup = async (email: string, password: string, base_currency: string = 'SEK', language: string = 'EN'): Promise<void> => {
+  const signup = async (
+    email: string,
+    password: string,
+    base_currency: string = "SEK",
+    language: string = "EN",
+  ): Promise<void> => {
     setError(null);
     setIsLoading(true);
 
@@ -143,8 +146,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setToken(authData.token);
       setUser(authData.user);
       setIsAuthenticated(true);
-
-      console.log("Signup successful:", authData.user.email);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Signup failed";
       setError(errorMessage);
@@ -167,11 +168,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setUser(null);
     setIsAuthenticated(false);
     setError(null);
-
-    console.log("Logout successful");
   };
 
-  const updateSettings = async (base_currency?: string, language?: string): Promise<void> => {
+  const updateSettings = async (
+    base_currency?: string,
+    language?: string,
+  ): Promise<void> => {
     setError(null);
     setIsLoading(true);
 
@@ -180,7 +182,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ base_currency, language }),
       });
@@ -196,7 +198,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem("authUser", JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update settings";
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update settings";
       setError(errorMessage);
       throw err;
     } finally {
