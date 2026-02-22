@@ -8,10 +8,33 @@ import {
   TableRow,
   Paper,
   CircularProgress,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import { api } from '../utils/api';
 import { useBudget } from '../context/BudgetContext';
 import type { MonthlyOutcome } from '../types/incomes-outcomes.types';
+
+// Generates months from 3 months ago to 6 months ahead for the Select dropdown
+function getMonthOptions() {
+  const months = [];
+  const today = new Date();
+  for (let i = -3; i <= 6; i++) {
+    const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const label = d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    months.push({ value, label });
+  }
+  return months;
+}
 
 const MonthlyOutcomesTable: React.FC = () => {
   const { fixedCostsTotal } = useBudget(); // Get fixed costs total from Table 1
@@ -20,22 +43,28 @@ const MonthlyOutcomesTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Edit dialog state — null means no row is selected (dialog closed)
+  const [editingOutcome, setEditingOutcome] = useState<MonthlyOutcome | null>(null);
+  const [editForm, setEditForm] = useState({ month: '', avgift_loan: '', debt: '', extra: '' });
+  const [editError, setEditError] = useState<string | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+
+  // Extracted so we can call it again after a successful edit
+  const fetchOutcomes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.get('/api/monthly-outcomes');
+      setOutcomes(response.monthlyOutcomes);
+    } catch (err) {
+      console.error('Error fetching monthly outcomes:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load monthly outcomes');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOutcomes = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const response = await api.get('/api/monthly-outcomes');
-        setOutcomes(response.monthlyOutcomes);
-      } catch (err) {
-        console.error('Error fetching monthly outcomes:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load monthly outcomes');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchOutcomes();
   }, []);
 
@@ -43,7 +72,6 @@ const MonthlyOutcomesTable: React.FC = () => {
     const avgiftLoan = parseFloat(outcome.avgift_loan);
     const debt = parseFloat(outcome.debt);
     const extra = parseFloat(outcome.extra);
-
     return avgiftLoan + fixedCostsTotal + debt + extra;
   };
 
@@ -55,6 +83,68 @@ const MonthlyOutcomesTable: React.FC = () => {
     const [year, monthNum] = month.split('-');
     const date = new Date(parseInt(year), parseInt(monthNum) - 1);
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  };
+
+  // Opens the edit dialog pre-filled with the clicked row's data
+  const handleRowClick = (outcome: MonthlyOutcome) => {
+    setEditingOutcome(outcome);
+    setEditForm({
+      month: outcome.month,
+      avgift_loan: outcome.avgift_loan,
+      debt: outcome.debt,
+      extra: outcome.extra,
+    });
+    setEditError(null);
+  };
+
+  const handleCloseEdit = () => {
+    setEditingOutcome(null);
+    setEditForm({ month: '', avgift_loan: '', debt: '', extra: '' });
+    setEditError(null);
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editingOutcome) return;
+
+    if (!editForm.month) {
+      setEditError('Month is required');
+      return;
+    }
+    if (editForm.avgift_loan === '' || parseFloat(editForm.avgift_loan) < 0) {
+      setEditError('Avgift + Loan must be 0 or greater');
+      return;
+    }
+    if (editForm.debt === '' || parseFloat(editForm.debt) < 0) {
+      setEditError('Debt must be 0 or greater');
+      return;
+    }
+    if (editForm.extra === '' || parseFloat(editForm.extra) < 0) {
+      setEditError('Extra must be 0 or greater');
+      return;
+    }
+
+    try {
+      setEditSubmitting(true);
+      setEditError(null);
+
+      await api.put(`/api/monthly-outcomes/${editingOutcome.id}`, {
+        month: editForm.month,
+        avgift_loan: parseFloat(editForm.avgift_loan),
+        debt: parseFloat(editForm.debt),
+        extra: parseFloat(editForm.extra),
+      });
+
+      // Re-fetch so the table shows fresh data without a full page reload
+      const response = await api.get('/api/monthly-outcomes');
+      setOutcomes(response.monthlyOutcomes);
+
+      handleCloseEdit();
+    } catch (err) {
+      console.error('Error updating monthly outcome:', err);
+      setEditError(err instanceof Error ? err.message : 'Failed to update monthly outcome');
+    } finally {
+      setEditSubmitting(false);
+    }
   };
 
   return (
@@ -117,7 +207,9 @@ const MonthlyOutcomesTable: React.FC = () => {
                   return (
                     <TableRow
                       key={outcome.id}
+                      onClick={() => handleRowClick(outcome)}
                       sx={{
+                        cursor: 'pointer',
                         '&:hover': { backgroundColor: '#fef2f2' },
                         transition: 'background-color 0.2s',
                       }}
@@ -130,11 +222,7 @@ const MonthlyOutcomesTable: React.FC = () => {
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{
-                          fontSize: '15px',
-                          fontStyle: 'italic',
-                          color: '#6b7280',
-                        }}
+                        sx={{ fontSize: '15px', fontStyle: 'italic', color: '#6b7280' }}
                       >
                         {formatCurrency(fixedCostsTotal)}
                       </TableCell>
@@ -158,6 +246,80 @@ const MonthlyOutcomesTable: React.FC = () => {
           </Table>
         </TableContainer>
       )}
+
+      {/* Edit Monthly Outcome Dialog */}
+      <Dialog open={!!editingOutcome} onClose={handleCloseEdit} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Monthly Outcome</DialogTitle>
+        <DialogContent>
+          <div className="flex flex-col gap-4 mt-2">
+            <FormControl fullWidth>
+              <InputLabel>Month</InputLabel>
+              <Select
+                value={editForm.month}
+                label="Month"
+                onChange={(e) =>
+                  setEditForm((prev) => ({ ...prev, month: e.target.value }))
+                }
+              >
+                {getMonthOptions().map((opt) => (
+                  <MenuItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            <TextField
+              label="Avgift + Loan (kr)"
+              type="number"
+              value={editForm.avgift_loan}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, avgift_loan: e.target.value }))
+              }
+              fullWidth
+              inputProps={{ min: 0, step: 0.01 }}
+            />
+
+            <TextField
+              label="Debt (kr)"
+              type="number"
+              value={editForm.debt}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, debt: e.target.value }))
+              }
+              fullWidth
+              inputProps={{ min: 0, step: 0.01 }}
+            />
+
+            <TextField
+              label="Extra (kr)"
+              type="number"
+              value={editForm.extra}
+              onChange={(e) =>
+                setEditForm((prev) => ({ ...prev, extra: e.target.value }))
+              }
+              fullWidth
+              inputProps={{ min: 0, step: 0.01 }}
+            />
+
+            {/* Fixed Costs Total is auto-calculated — not shown here */}
+
+            {editError && (
+              <div className="bg-red-50 border border-red-200 rounded p-3 text-red-700 text-sm">
+                {editError}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEdit} disabled={editSubmitting}>
+            Cancel
+          </Button>
+          <Button onClick={handleEditSubmit} variant="contained" disabled={editSubmitting}>
+            {editSubmitting ? 'Saving...' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

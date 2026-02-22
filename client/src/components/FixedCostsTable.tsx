@@ -49,6 +49,9 @@ const FixedCostsTable: React.FC = () => {
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
 
+  // null = adding a new cost; set to a row object = editing that row
+  const [editingCost, setEditingCost] = useState<FixedCost | null>(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -106,6 +109,19 @@ const FixedCostsTable: React.FC = () => {
     setDialogOpen(false);
     setFormData({ description: "", amount: "", currency: "SEK" });
     setFormError(null);
+    setEditingCost(null); // clear edit target so next open defaults to "Add"
+  };
+
+  // Opens the dialog pre-filled with a row's data for editing
+  const handleRowClick = (cost: FixedCost) => {
+    setEditingCost(cost);
+    setFormData({
+      description: cost.description,
+      amount: cost.amount,
+      currency: cost.currency,
+    });
+    setFormError(null);
+    setDialogOpen(true);
   };
 
   const handleFormChange = (field: string, value: string) => {
@@ -130,19 +146,27 @@ const FixedCostsTable: React.FC = () => {
       setSubmitting(true);
       setFormError(null);
 
-      await api.post("/api/fixed-costs", {
+      const payload = {
         description: description.trim(),
         amount: parseFloat(amount),
         currency,
-      });
+      };
+
+      if (editingCost) {
+        // Edit existing row
+        await api.put(`/api/fixed-costs/${editingCost.id}`, payload);
+      } else {
+        // Add new row
+        await api.post("/api/fixed-costs", payload);
+      }
 
       const response = await api.get("/api/fixed-costs");
       setFixedCosts(response.fixedCosts);
 
       handleCloseDialog();
     } catch (err) {
-      console.error("Error creating fixed cost:", err);
-      setFormError(err instanceof Error ? err.message : "Failed to create fixed cost");
+      console.error("Error saving fixed cost:", err);
+      setFormError(err instanceof Error ? err.message : "Failed to save fixed cost");
     } finally {
       setSubmitting(false);
     }
@@ -209,7 +233,9 @@ const FixedCostsTable: React.FC = () => {
                   {fixedCosts.map((cost) => (
                     <TableRow
                       key={cost.id}
+                      onClick={() => handleRowClick(cost)}
                       sx={{
+                        cursor: "pointer",
                         "&:hover": { backgroundColor: "#f9fafb" },
                         transition: "background-color 0.2s",
                       }}
@@ -266,7 +292,9 @@ const FixedCostsTable: React.FC = () => {
       )}
 
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{t.outcomes.fixedCosts.dialog.title}</DialogTitle>
+        <DialogTitle>
+          {editingCost ? "Edit Fixed Cost" : t.outcomes.fixedCosts.dialog.title}
+        </DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-4 mt-2">
             <TextField
