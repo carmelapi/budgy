@@ -53,13 +53,13 @@ CORRECT FLOW:
 1. Claude implements backend completely (all routes, controllers, DB changes)
 2. Claude says: "✅ Backend done. Files modified: [list]. Ready for you to test."
 3. I test the backend (Postman, curl, etc.)
-4. I do: git add / commit / push
+4.Let me know when is done with a message where shortly you explain what you did, I do: git add / commit / push
 5. I say: "ok, go with Frontend"
 6. Claude implements ONLY the first page (e.g. LoginPage)
 7. Claude says: "✅ LoginPage done. Files: [list]. Test it and let me know."
 8. I test the page
 9. I do: git add / commit / push (if happy)
-10. I say: "ok procedi" OR "cambia questo..."
+10. I say: "ok, continue" OR "change this..."
 11. Repeat for each page
 ```
 
