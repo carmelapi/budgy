@@ -37,6 +37,8 @@ Junior frontend developer learning full-stack development. Explain things in tut
 - Backend: Express.js + PostgreSQL
 - Routing: React Router
 
+**Design Style:** iOS — follow iOS Human Interface Guidelines. See [`CLAUDE.frontend.md`](./CLAUDE.frontend.md) for details.
+
 ---
 
 ## 🚨 CRITICAL WORKFLOW — Backend First, Always

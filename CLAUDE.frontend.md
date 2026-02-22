@@ -33,6 +33,22 @@
 
 ---
 
+## Design Style — iOS
+
+All UI must follow **iOS Human Interface Guidelines** style:
+
+- Clean, minimal layouts with generous white space
+- System-like typography: SF Pro-inspired fonts (or `system-ui` / `-apple-system`)
+- Rounded corners on cards and buttons (`border-radius: 12–16px`)
+- Subtle shadows, no harsh borders
+- Color palette: white/light backgrounds, blue accent (`#007AFF`), soft grays
+- Bottom navigation bar (tab bar) pattern for mobile-first layout
+- List rows with separators (no heavy borders), like native iOS table views
+- Smooth transitions and subtle animations
+- Avoid material/flat design patterns — always prefer the iOS native feel
+
+---
+
 ## Rules
 
 - Implement **1 page at a time** — never all at once
