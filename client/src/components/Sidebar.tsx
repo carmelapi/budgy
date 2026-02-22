@@ -41,6 +41,18 @@ export default function Sidebar() {
       >
         Incomes
       </Link>
+
+      {/* Outcomes Link */}
+      <Link
+        to="/outcomes"
+        className={`px-4 py-3 rounded-lg transition-colors ${
+          isActive("/outcomes")
+            ? "bg-blue-600 text-white font-semibold"
+            : "text-gray-700 hover:bg-gray-200"
+        }`}
+      >
+        Outcomes
+      </Link>
     </div>
   );
 }
