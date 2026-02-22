@@ -8,10 +8,10 @@ build
 # Environment files (NEVER commit these - they contain secrets)
 .env
 .env.*
-server/.env
-server/.env.*
-client/.env
-client/.env.*
+apps/api/.env
+apps/api/.env.*
+apps/web/.env
+apps/web/.env.*
 
 # OS files
 .DS_Store

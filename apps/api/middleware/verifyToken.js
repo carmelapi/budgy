@@ -15,7 +15,7 @@ const verifyToken = (req, res, next) => {
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({
-      error: 'Access denied. No token provided.'
+      message: 'Access denied. No token provided.'
     });
   }
 
@@ -37,7 +37,7 @@ const verifyToken = (req, res, next) => {
   } catch (error) {
     // Token is invalid or expired
     return res.status(401).json({
-      error: 'Invalid or expired token.'
+      message: 'Invalid or expired token.'
     });
   }
 };

@@ -1,12 +1,12 @@
 import express from 'express';
-import verifyToken from '../middleware/verifyToken.js';
+import verifyToken from '../../middleware/verifyToken.js';
 import {
   getAllIncomes,
   getIncomeById,
   createIncome,
   updateIncome,
   deleteIncome
-} from '../controllers/incomesController.js';
+} from './incomes.controller.js';
 
 const router = express.Router();
 
