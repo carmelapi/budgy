@@ -1,12 +1,12 @@
 import express from 'express';
-import verifyToken from '../middleware/verifyToken.js';
+import verifyToken from '../../middleware/verifyToken.js';
 import {
   getAllFixedCosts,
   getFixedCostById,
   createFixedCost,
   updateFixedCost,
   deleteFixedCost
-} from '../controllers/fixedCostsController.js';
+} from './fixed-costs.controller.js';
 
 const router = express.Router();
 

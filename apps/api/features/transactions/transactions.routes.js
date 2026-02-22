@@ -1,5 +1,5 @@
 import express from 'express';
-import verifyToken from '../middleware/verifyToken.js';
+import verifyToken from '../../middleware/verifyToken.js';
 import {
   getAllTransactions,
   getTransactionById,
@@ -7,7 +7,7 @@ import {
   updateTransaction,
   deleteTransaction,
   getMonthlyBalance
-} from '../controllers/transactionController.js';
+} from './transactions.controller.js';
 
 const router = express.Router();
 

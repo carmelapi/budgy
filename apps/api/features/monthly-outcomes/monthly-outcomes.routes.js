@@ -1,12 +1,12 @@
 import express from 'express';
-import verifyToken from '../middleware/verifyToken.js';
+import verifyToken from '../../middleware/verifyToken.js';
 import {
   getAllMonthlyOutcomes,
   getMonthlyOutcomeById,
   createMonthlyOutcome,
   updateMonthlyOutcome,
   deleteMonthlyOutcome
-} from '../controllers/monthlyOutcomesController.js';
+} from './monthly-outcomes.controller.js';
 
 const router = express.Router();
 
