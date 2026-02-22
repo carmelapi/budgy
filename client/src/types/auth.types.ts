@@ -6,6 +6,8 @@
 export interface User {
   id: number;
   email: string;
+  base_currency?: string;
+  language?: string;
 }
 
 // Response from login/signup endpoints
@@ -25,6 +27,7 @@ export interface AuthContextType {
 
   // Methods
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, base_currency?: string, language?: string) => Promise<void>;
   logout: () => void;
+  updateSettings: (base_currency?: string, language?: string) => Promise<void>;
 }

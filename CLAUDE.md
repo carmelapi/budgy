@@ -37,34 +37,81 @@ Junior frontend developer learning full-stack development. Explain things in tut
 - Backend: Express.js + PostgreSQL
 - Routing: React Router
 
+**Design Style:** iOS — follow iOS Human Interface Guidelines. See [`CLAUDE.frontend.md`](./CLAUDE.frontend.md) for details.
+
 ---
 
 ## 🚨 CRITICAL WORKFLOW — Backend First, Always
 
 This is the most important rule. **Never work on frontend and backend at the same time.**
 
+Each feature uses **3 branches**: one parent + one for BE + one for FE.
+
+```
+main
+└── feature/incomes-page              ← parent branch for the whole feature
+    ├── feature/incomes-page-be       ← backend sub-branch
+    └── feature/incomes-page-fe       ← frontend sub-branch
+```
+
 ```
 CORRECT FLOW:
 
-0. 🌿 CREATE BRANCH FIRST (before anything else!):
-   git checkout main && git pull origin main
-   git checkout -b feature/nome-feature
+── SETUP ──────────────────────────────────────────────────────
 
-1. Claude implements backend completely (all routes, controllers, DB changes)
-2. Claude says: "✅ Backend done. Files modified: [list]. Ready for you to test."
-3. I test the backend (Postman, curl, etc.)
-4. I do: git add / commit / push
-5. I say: "ok, go with Frontend"
-6. Claude implements ONLY the first page (e.g. LoginPage)
-7. Claude says: "✅ LoginPage done. Files: [list]. Test it and let me know."
-8. I test the page
-9. I do: git add / commit / push (if happy)
-10. I say: "ok procedi" OR "cambia questo..."
-11. Repeat for each page
+0. 🌿 Create the PARENT branch first (from main):
+   git checkout main
+   git pull origin main
+   git checkout -b feature/<feature-name>
+
+── BACKEND PHASE ──────────────────────────────────────────────
+
+1. 🔀 Create the BE sub-branch (from parent, NOT from main):
+   git checkout -b feature/<feature-name>-be
+
+2. Claude implements backend completely (routes + controllers + DB changes)
+
+3. Claude says: "✅ Backend done. Files modified: [list]. Brief summary of what was built."
+
+4. I test the backend (Postman, curl, etc.)
+
+5. Merge BE into parent and push:
+   git add . && git commit -m "feat: backend for <feature-name>"
+   git checkout feature/<feature-name>
+   git merge feature/<feature-name>-be
+   git push origin feature/<feature-name>
+
+── FRONTEND PHASE ─────────────────────────────────────────────
+
+6. I say: "ok, go with Frontend"
+
+7. 🔀 Create the FE sub-branch (from parent, NOT from main):
+   git checkout feature/<feature-name>
+   git checkout -b feature/<feature-name>-fe
+
+8. Claude implements ONLY the first page
+
+9. Claude says: "✅ [PageName] done. Files: [list]. Test it and let me know."
+
+10. I test the page
+
+11. Merge FE into parent and push:
+    git add . && git commit -m "feat: frontend <feature-name>"
+    git checkout feature/<feature-name>
+    git merge feature/<feature-name>-fe
+    git push origin feature/<feature-name>
+
+12. I say: "ok, continue" OR "change this..."
+13. Repeat steps 7–12 for each additional page
+
+── DONE ───────────────────────────────────────────────────────
+
+14. 🎉 Open PR: feature/<feature-name> → main on GitHub
 ```
 
 **Rules:**
 
+- Always create sub-branches FROM the parent branch, never directly from main
 - Backend: complete ALL routes + controllers + DB changes before touching frontend
 - Frontend: implement **1 page at a time**, wait for my feedback before moving on
 - **Never** implement all pages at once
@@ -74,23 +121,16 @@ CORRECT FLOW:
 
 ## Development Workflow
 
-> 🚨 **Golden Rule**: Create the branch **FIRST** of all — before planning, before coding, before asking Claude.
+> 🚨 **Golden Rule**: Create the branch **FIRST** — before planning, before coding, before asking Claude.
 
 ```bash
-# ✅ ALWAYS first thing
+# ✅ ALWAYS first thing — create the parent branch:
 git checkout main
 git pull origin main
-git checkout -b feature/nome-feature
+git checkout -b feature/<feature-name>
+
+# Then follow the CRITICAL WORKFLOW above for BE and FE sub-branches
 ```
-
-1. **First of all**: Create the branch (see above)
-2. Then ask Claude to explain the plan
-3. Backend phase → Tests → Commit/push
-4. Frontend phase (page by page) → Tests → Commit/push
-5. When all pages are done: Create PR on GitHub
-6. After merge: Deploy to Hetzner
-
-> ⚠️ **Common junior mistake**: starting work on `main` and only realizing it later. If you forget, you can fix it with `git checkout -b feature/name` even halfway through (unpushed commits will move to the new branch).
 
 ---
 
@@ -134,4 +174,4 @@ pm2 monit               # Real-time dashboard
 - **API calls failing**: Check `VITE_API_URL` in `.env`
 - **DB connection fails**: Check PostgreSQL is running + `.env` credentials
 - **CORS errors**: Check CORS middleware in `server.js`
-- **PM2 crashes**: `pm2 logs budgy-api`# CLAUDE.md — Budgy Project Overview
+- **PM2 crashes**: `pm2 logs budgy-api`
