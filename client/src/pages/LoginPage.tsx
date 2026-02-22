@@ -1,4 +1,4 @@
-import { Button, FormControl, FormLabel, Alert } from "@mui/material";
+import { Button, FormControl, FormLabel, Alert, Select, MenuItem } from "@mui/material";
 import Input from "@mui/material/Input";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,8 @@ import { useAuth } from "../context/AuthContext";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [baseCurrency, setBaseCurrency] = useState<string>("SEK");
+  const [language, setLanguage] = useState<string>("EN");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -62,10 +64,8 @@ export default function LoginPage() {
     }
 
     try {
-      await signup(email, password);
-      // Navigation happens automatically via useEffect when isAuthenticated changes
+      await signup(email, password, baseCurrency, language);
     } catch (err) {
-      // Error is already set in AuthContext
       console.error("Signup failed:", err);
     }
   };
@@ -135,6 +135,38 @@ export default function LoginPage() {
             fullWidth
           />
         </FormControl>
+
+        {/* Language selector (only for signup) */}
+        {mode === "signup" && (
+          <FormControl className="w-full">
+            <FormLabel>Language</FormLabel>
+            <Select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              disabled={isLoading}
+              fullWidth
+            >
+              <MenuItem value="EN">English</MenuItem>
+              <MenuItem value="IT">Italiano</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+
+        {/* Currency selector (only for signup) */}
+        {mode === "signup" && (
+          <FormControl className="w-full">
+            <FormLabel>Preferred Currency</FormLabel>
+            <Select
+              value={baseCurrency}
+              onChange={(e) => setBaseCurrency(e.target.value)}
+              disabled={isLoading}
+              fullWidth
+            >
+              <MenuItem value="SEK">SEK - Swedish Krona</MenuItem>
+              <MenuItem value="EUR">EUR - Euro</MenuItem>
+            </Select>
+          </FormControl>
+        )}
 
         {/* Submit button */}
         <Button

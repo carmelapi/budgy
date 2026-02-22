@@ -1,21 +1,23 @@
-let cachedRate: number | null = null;
+interface ExchangeRates {
+  [key: string]: number;
+}
+
+let cachedRates: ExchangeRates | null = null;
 let cacheTimestamp: number | null = null;
 const CACHE_DURATION = 60 * 60 * 1000;
 
-export async function fetchExchangeRate(): Promise<number> {
+export async function fetchExchangeRates(): Promise<ExchangeRates> {
   const now = Date.now();
 
-  if (cachedRate !== null && cacheTimestamp !== null) {
+  if (cachedRates !== null && cacheTimestamp !== null) {
     if (now - cacheTimestamp < CACHE_DURATION) {
-      return cachedRate;
+      return cachedRates;
     }
   }
 
   try {
-    console.log("Fetching fresh EUR→SEK exchange rate...");
-
     const response = await fetch(
-      "https://api.frankfurter.app/latest?from=EUR&to=SEK",
+      "https://api.frankfurter.app/latest?from=EUR",
     );
 
     if (!response.ok) {
@@ -23,22 +25,20 @@ export async function fetchExchangeRate(): Promise<number> {
     }
 
     const data = await response.json();
-    const rate = data.rates.SEK;
+    const rates: ExchangeRates = { ...data.rates, EUR: 1 };
 
-    if (!rate || isNaN(rate)) {
-      throw new Error("Invalid rate in response");
-    }
-
-    cachedRate = rate;
+    cachedRates = rates;
     cacheTimestamp = now;
-
-    console.log("Fresh exchange rate:", rate);
-    return rate;
+    return rates;
   } catch (error) {
-    console.error("Failed to fetch exchange rate:", error);
-    console.warn("Using fallback rate: 11.5");
-    return 11.5;
+    console.error("Failed to fetch exchange rates:", error);
+    return { EUR: 1, SEK: 11.5 };
   }
+}
+
+export async function fetchExchangeRate(): Promise<number> {
+  const rates = await fetchExchangeRates();
+  return rates.SEK || 11.5;
 }
 
 export function convertEurToSek(amountEur: number, rate: number): number {
@@ -57,19 +57,50 @@ export function formatCurrency(
   return currency === "SEK" ? `${formatted} kr` : `${formatted} EUR`;
 }
 
+export function convertCurrency(
+  amount: number,
+  fromCurrency: string,
+  toCurrency: string,
+  rates: ExchangeRates
+): number {
+  if (fromCurrency === toCurrency) {
+    return amount;
+  }
+
+  const amountInEUR = fromCurrency === 'EUR' ? amount : amount / rates[fromCurrency];
+  const convertedAmount = toCurrency === 'EUR' ? amountInEUR : amountInEUR * rates[toCurrency];
+
+  return parseFloat(convertedAmount.toFixed(2));
+}
+
 export function formatCurrencyWithConversion(
   amount: number,
   currency: "SEK" | "EUR",
-  exchangeRate?: number,
+  userBaseCurrency: string,
+  rates: ExchangeRates
 ): string {
-  if (currency === "SEK") {
-    return formatCurrency(amount, "SEK");
+  if (currency === userBaseCurrency) {
+    const symbol = userBaseCurrency === 'SEK' ? 'kr' : 'EUR';
+    const formatted = amount.toLocaleString("sv-SE", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+    return `${formatted} ${symbol}`;
   }
 
-  if (!exchangeRate) {
-    return formatCurrency(amount, "EUR");
-  }
+  const convertedAmount = convertCurrency(amount, currency, userBaseCurrency, rates);
+  const baseSymbol = userBaseCurrency === 'SEK' ? 'kr' : 'EUR';
+  const originalSymbol = currency === 'SEK' ? 'kr' : 'EUR';
 
-  const convertedAmount = convertEurToSek(amount, exchangeRate);
-  return `${formatCurrency(convertedAmount, "SEK")} (${formatCurrency(amount, "EUR")})`;
+  const formattedConverted = convertedAmount.toLocaleString("sv-SE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const formattedOriginal = amount.toLocaleString("sv-SE", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  return `${formattedConverted} ${baseSymbol} (${formattedOriginal} ${originalSymbol})`;
 }
