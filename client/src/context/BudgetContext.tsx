@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import type { MonthlyIncome } from '../types/incomes-outcomes.types';
+import React, { createContext, useContext, useState } from "react";
+import type { ReactNode } from "react";
+import type { MonthlyIncome } from "../types/incomes-outcomes.types";
 
 /**
  * Budget Context - Share data across Outcomes page tables
@@ -34,7 +35,9 @@ const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
  * Wraps the app (or Outcomes page) to provide budget data
  * All child components can access this data using useBudget() hook
  */
-export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const BudgetProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [incomes, setIncomes] = useState<MonthlyIncome[]>([]);
   const [fixedCostsTotal, setFixedCostsTotal] = useState<number>(0);
 
@@ -51,7 +54,9 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     setFixedCostsTotal,
   };
 
-  return <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>;
+  return (
+    <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>
+  );
 };
 
 /**
@@ -64,7 +69,7 @@ export const useBudget = (): BudgetContextType => {
   const context = useContext(BudgetContext);
 
   if (context === undefined) {
-    throw new Error('useBudget must be used within a BudgetProvider');
+    throw new Error("useBudget must be used within a BudgetProvider");
   }
 
   return context;
