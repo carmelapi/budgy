@@ -1,17 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 
-/**
- * Sidebar Component
- *
- * Navigation menu for the app
- * Shows active state for current route
- */
 export default function Sidebar() {
-  // useLocation hook gives us the current URL path
-  // Example: if we're at "/incomes", pathname = "/incomes"
   const location = useLocation();
 
-  // Helper function to check if a link is active
   const isActive = (path: string): boolean => {
     return location.pathname === path;
   };

@@ -7,24 +7,9 @@ import BudgetAnalysisTable from '../components/BudgetAnalysisTable';
 import { useBudget } from '../context/BudgetContext';
 import { api } from '../utils/api';
 
-/**
- * Outcomes Page Component
- *
- * Main page that combines 3 tables:
- * 1. Fixed Costs (grey) - Recurring expenses with EUR conversion
- * 2. Monthly Outcomes (red) - Monthly expense breakdown
- * 3. Budget Analysis (yellow) - Budget calculations and percentages
- *
- * Why separate components? Each table has complex logic.
- * Splitting makes code easier to read and maintain.
- */
 const OutcomesPage: React.FC = () => {
   const { setIncomes } = useBudget();
 
-  /**
-   * Fetch income data for budget calculations
-   * Table 3 (Budget Analysis) needs this to calculate percentages
-   */
   useEffect(() => {
     const fetchIncomes = async () => {
       try {

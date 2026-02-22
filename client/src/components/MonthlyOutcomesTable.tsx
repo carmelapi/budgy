@@ -13,14 +13,6 @@ import { api } from '../utils/api';
 import { useBudget } from '../context/BudgetContext';
 import type { MonthlyOutcome } from '../types/incomes-outcomes.types';
 
-/**
- * Monthly Outcomes Table Component
- *
- * Shows monthly expense breakdown
- * - Red background
- * - Columns: Month | Avgift+Loan | Fixed Costs Total | Debt | Extra | Total
- * - "Fixed Costs Total" is READ-ONLY (pulled from context)
- */
 const MonthlyOutcomesTable: React.FC = () => {
   const { fixedCostsTotal } = useBudget(); // Get fixed costs total from Table 1
 
@@ -28,9 +20,6 @@ const MonthlyOutcomesTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Fetch monthly outcomes from API
-   */
   useEffect(() => {
     const fetchOutcomes = async () => {
       try {
@@ -50,10 +39,6 @@ const MonthlyOutcomesTable: React.FC = () => {
     fetchOutcomes();
   }, []);
 
-  /**
-   * Calculate total for a row
-   * Total = Avgift+Loan + Fixed Costs Total + Debt + Extra
-   */
   const calculateRowTotal = (outcome: MonthlyOutcome): number => {
     const avgiftLoan = parseFloat(outcome.avgift_loan);
     const debt = parseFloat(outcome.debt);
@@ -62,16 +47,10 @@ const MonthlyOutcomesTable: React.FC = () => {
     return avgiftLoan + fixedCostsTotal + debt + extra;
   };
 
-  /**
-   * Format currency
-   */
   const formatCurrency = (amount: number): string => {
     return `${amount.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr`;
   };
 
-  /**
-   * Format month (2026-02 → Feb 2026)
-   */
   const formatMonth = (month: string): string => {
     const [year, monthNum] = month.split('-');
     const date = new Date(parseInt(year), parseInt(monthNum) - 1);

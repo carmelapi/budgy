@@ -13,14 +13,6 @@ import { api } from '../utils/api';
 import { useBudget } from '../context/BudgetContext';
 import type { MonthlyOutcome } from '../types/incomes-outcomes.types';
 
-/**
- * Budget Analysis Table Component
- *
- * Shows budget analysis with percentages and final calculations
- * - Yellow background
- * - Complex formulas based on incomes and outcomes
- * - Columns: Month | Outcomes % | Remaining % | Remaining (kr) | Final Total
- */
 const BudgetAnalysisTable: React.FC = () => {
   const { getIncomeForMonth, fixedCostsTotal } = useBudget();
 
@@ -28,9 +20,6 @@ const BudgetAnalysisTable: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Fetch monthly outcomes (same data as Table 2)
-   */
   useEffect(() => {
     const fetchOutcomes = async () => {
       try {
@@ -50,9 +39,6 @@ const BudgetAnalysisTable: React.FC = () => {
     fetchOutcomes();
   }, []);
 
-  /**
-   * Calculate monthly outcome total (same as Table 2)
-   */
   const calculateMonthlyOutcomeTotal = (outcome: MonthlyOutcome): number => {
     const avgiftLoan = parseFloat(outcome.avgift_loan);
     const debt = parseFloat(outcome.debt);
@@ -61,23 +47,14 @@ const BudgetAnalysisTable: React.FC = () => {
     return avgiftLoan + fixedCostsTotal + debt + extra;
   };
 
-  /**
-   * Format currency
-   */
   const formatCurrency = (amount: number): string => {
     return `${amount.toLocaleString('sv-SE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr`;
   };
 
-  /**
-   * Format percentage
-   */
   const formatPercentage = (value: number): string => {
     return `${value.toFixed(2)}%`;
   };
 
-  /**
-   * Format month (2026-02 → Feb 2026)
-   */
   const formatMonth = (month: string): string => {
     const [year, monthNum] = month.split('-');
     const date = new Date(parseInt(year), parseInt(monthNum) - 1);
@@ -139,7 +116,6 @@ const BudgetAnalysisTable: React.FC = () => {
                   const month = outcome.month;
                   const income = getIncomeForMonth(month);
 
-                  // If no income data for this month, skip calculations
                   if (!income) {
                     return (
                       <TableRow key={outcome.id}>
@@ -154,36 +130,10 @@ const BudgetAnalysisTable: React.FC = () => {
                   const incomesTotal = parseFloat(income.total);
                   const outcomesTotal = calculateMonthlyOutcomeTotal(outcome);
 
-                  /**
-                   * Formula 1: Outcomes Percentage
-                   * Shows what % of income goes to expenses
-                   * Example: 15,000 kr expenses ÷ 30,000 kr income × 100 = 50%
-                   */
                   const outcomesPercent = (outcomesTotal / incomesTotal) * 100;
-
-                  /**
-                   * Formula 2: Remaining Percentage
-                   * 30% is savings goal (hardcoded requirement)
-                   * Remaining = 100% - outcomes% - 30% savings
-                   * Example: 100% - 50% - 30% = 20%
-                   */
                   const savingsGoal = 30;
                   const remainingPercent = 100 - outcomesPercent - savingsGoal;
-
-                  /**
-                   * Formula 3: Remaining in kr
-                   * Convert percentage back to SEK amount
-                   * Example: 20% of 30,000 kr = 6,000 kr
-                   */
                   const remainingInKr = (remainingPercent / 100) * incomesTotal;
-
-                  /**
-                   * Formula 4: Final Total Outcomes
-                   * If budget is positive (remainingPercent > 0): add leftover money to expenses
-                   * If budget is negative (remainingPercent ≤ 0): just show expenses
-                   *
-                   * Why? If you have money left over, it counts as "used budget"
-                   */
                   const finalTotal =
                     remainingPercent > 0 ? outcomesTotal + remainingInKr : outcomesTotal;
 

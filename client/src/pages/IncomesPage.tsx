@@ -25,8 +25,6 @@ const IncomesPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        // Call backend API: GET /api/incomes
-        // This returns: { incomes: [...] }
         const response = await api.get("/api/incomes");
 
         setIncomes(response.incomes);
@@ -41,19 +39,11 @@ const IncomesPage: React.FC = () => {
     fetchIncomes();
   }, []);
 
-  /**
-   * Helper: Format currency
-   * Converts "35000.00" string to "35,000.00 kr"
-   */
   const formatCurrency = (amount: string): string => {
     const num = parseFloat(amount);
     return `${num.toLocaleString("sv-SE", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} kr`;
   };
 
-  /**
-   * Helper: Format month
-   * Converts "2026-02" to "Feb 2026"
-   */
   const formatMonth = (month: string): string => {
     const [year, monthNum] = month.split("-");
     const date = new Date(parseInt(year), parseInt(monthNum) - 1);
@@ -112,7 +102,6 @@ const IncomesPage: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   {incomes.length === 0 ? (
-                    // Empty state - no income data yet
                     <TableRow>
                       <TableCell
                         colSpan={4}
@@ -128,8 +117,6 @@ const IncomesPage: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    // Map through incomes array and create a row for each income
-                    // Why key={income.id}? React needs unique IDs to efficiently update the list
                     incomes.map((income) => (
                       <TableRow
                         key={income.id}

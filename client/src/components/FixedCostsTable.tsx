@@ -15,15 +15,6 @@ import { fetchExchangeRate, formatCurrencyWithConversion } from '../utils/curren
 import { useBudget } from '../context/BudgetContext';
 import type { FixedCost } from '../types/incomes-outcomes.types';
 
-/**
- * Fixed Costs Table Component
- *
- * Shows recurring monthly expenses (rent, subscriptions, etc.)
- * - Grey background
- * - Supports SEK and EUR currencies
- * - EUR amounts converted to SEK using live exchange rates
- * - Grand Total in footer
- */
 const FixedCostsTable: React.FC = () => {
   const { setFixedCostsTotal } = useBudget();
 
@@ -32,16 +23,12 @@ const FixedCostsTable: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [exchangeRate, setExchangeRate] = useState<number | null>(null);
 
-  /**
-   * Fetch fixed costs from API and exchange rate
-   */
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // Fetch both in parallel for better performance
         const [costsResponse, rate] = await Promise.all([
           api.get('/api/fixed-costs'),
           fetchExchangeRate(),
@@ -60,12 +47,6 @@ const FixedCostsTable: React.FC = () => {
     fetchData();
   }, []);
 
-  /**
-   * Calculate grand total in SEK
-   *
-   * Why .reduce()? It's like a for loop that adds up all amounts
-   * Example: [728, 500, 230] → 728 + 500 + 230 = 1458
-   */
   const calculateGrandTotal = (): number => {
     if (!exchangeRate) return 0;
 
@@ -73,20 +54,15 @@ const FixedCostsTable: React.FC = () => {
       const amount = parseFloat(cost.amount);
 
       if (cost.currency === 'EUR') {
-        // Convert EUR to SEK
         return sum + amount * exchangeRate;
       }
 
       return sum + amount;
-    }, 0); // Start sum at 0
+    }, 0);
   };
 
   const grandTotal = calculateGrandTotal();
 
-  /**
-   * Update context with grand total
-   * Other tables (Monthly Outcomes, Budget Analysis) need this value
-   */
   useEffect(() => {
     setFixedCostsTotal(grandTotal);
   }, [grandTotal, setFixedCostsTotal]);
