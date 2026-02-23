@@ -19,8 +19,6 @@ import {
   Select,
   MenuItem,
 } from "@mui/material";
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
 import { api } from "../utils/api";
 import type { MonthlyIncome } from "../types/incomes-outcomes.types";
 
@@ -136,10 +134,7 @@ const IncomesPage: React.FC = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="flex flex-row w-full h-[calc(100vh-60px)]">
-        <Sidebar />
-        <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
+      <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
           <h1 className="text-2xl font-bold text-gray-800">Monthly Incomes</h1>
 
           {loading && (
@@ -220,9 +215,9 @@ const IncomesPage: React.FC = () => {
             </TableContainer>
           )}
         </div>
-      </div>
 
       {/* Edit Income Dialog */}
+
       <Dialog open={!!editingIncome} onClose={handleCloseEdit} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Income</DialogTitle>
         <DialogContent>

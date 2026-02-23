@@ -1,6 +1,4 @@
 import React, { useEffect } from 'react';
-import Navbar from '../components/Navbar';
-import Sidebar from '../components/Sidebar';
 import FixedCostsTable from '../components/FixedCostsTable';
 import MonthlyOutcomesTable from '../components/MonthlyOutcomesTable';
 import BudgetAnalysisTable from '../components/BudgetAnalysisTable';
@@ -24,26 +22,18 @@ const OutcomesPage: React.FC = () => {
   }, [setIncomes]);
 
   return (
-    <>
-      <Navbar />
-      <div className="flex flex-row w-full h-[calc(100vh-60px)]">
-        <Sidebar />
+    <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
+      <h1 className="text-2xl font-bold text-gray-800">Outcomes</h1>
 
-        {/* Main content area */}
-        <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
-          <h1 className="text-2xl font-bold text-gray-800">Outcomes</h1>
+      {/* Table 1: Fixed Costs (Grey background) */}
+      <FixedCostsTable />
 
-          {/* Table 1: Fixed Costs (Grey background) */}
-          <FixedCostsTable />
+      {/* Table 2: Monthly Outcomes (Red background) */}
+      <MonthlyOutcomesTable />
 
-          {/* Table 2: Monthly Outcomes (Red background) */}
-          <MonthlyOutcomesTable />
-
-          {/* Table 3: Budget Analysis (Yellow background) */}
-          <BudgetAnalysisTable />
-        </div>
-      </div>
-    </>
+      {/* Table 3: Budget Analysis (Yellow background) */}
+      <BudgetAnalysisTable />
+    </div>
   );
 };
 
