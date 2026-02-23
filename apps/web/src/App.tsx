@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import IncomesPage from "./pages/IncomesPage";
 import OutcomesPage from "./pages/OutcomesPage";
 import PrivateRoute from "./components/PrivateRoute";
+import AppLayout from "./components/AppLayout";
 import { BudgetProvider } from "./context/BudgetContext";
 
 export default function App() {
@@ -13,29 +14,16 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route
-          path="/dashboard"
           element={
             <PrivateRoute>
-              <Dashboard />
+              <AppLayout />
             </PrivateRoute>
           }
-        />
-        <Route
-          path="/incomes"
-          element={
-            <PrivateRoute>
-              <IncomesPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/outcomes"
-          element={
-            <PrivateRoute>
-              <OutcomesPage />
-            </PrivateRoute>
-          }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/incomes" element={<IncomesPage />} />
+          <Route path="/outcomes" element={<OutcomesPage />} />
+        </Route>
       </Routes>
     </BudgetProvider>
   );

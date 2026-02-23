@@ -1,15 +1,15 @@
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-import Body from "../components/Body";
+import Chart from "../components/Chart";
+import ToDo from "../components/ToDo";
+import DashboardTable from "../components/DashboardTable";
 
 export default function Dashboard() {
   return (
-    <>
-      <Navbar />
-      <div className="flex flex-row w-full h-[calc(100vh-60px)]">
-        <Sidebar />
-        <Body />
+    <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
+      <div className="flex flex-row gap-4">
+        <Chart />
+        <ToDo />
       </div>
-    </>
+      <DashboardTable />
+    </div>
   );
 }
