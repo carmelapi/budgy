@@ -5,7 +5,7 @@ import * as authService from "./auth.service.js";
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
-  const { email, password, base_currency = "SEK", language = "EN" } = req.body;
+  const { email, password, base_currency = "SEK", language = "EN", initial_balance = 0 } = req.body;
 
   try {
     if (!["SEK", "EUR"].includes(base_currency)) {
@@ -28,6 +28,7 @@ router.post("/signup", async (req, res) => {
       password,
       base_currency,
       language,
+      initial_balance,
     );
     const token = authService.generateToken(newUser.id, newUser.email);
     return res.status(201).json({
@@ -37,6 +38,7 @@ router.post("/signup", async (req, res) => {
         email: newUser.email,
         base_currency: newUser.base_currency,
         language: newUser.language,
+        initial_balance: newUser.initial_balance,
       },
     });
   } catch (error) {
@@ -63,6 +65,7 @@ router.post("/login", async (req, res) => {
         email: user.email,
         base_currency: user.base_currency || "SEK",
         language: user.language || "EN",
+        initial_balance: user.initial_balance ?? 0,
       },
     });
   } catch (error) {
@@ -72,7 +75,7 @@ router.post("/login", async (req, res) => {
 });
 
 router.put("/settings", verifyToken, async (req, res) => {
-  const { base_currency, language } = req.body;
+  const { base_currency, language, initial_balance } = req.body;
 
   try {
     if (base_currency && !["SEK", "EUR"].includes(base_currency)) {
@@ -85,6 +88,7 @@ router.put("/settings", verifyToken, async (req, res) => {
     const user = await authService.updateSettings(req.user.userId, {
       base_currency,
       language,
+      initial_balance,
     });
     if (!user) return res.status(400).json({ message: "No fields to update" });
 
@@ -94,6 +98,7 @@ router.put("/settings", verifyToken, async (req, res) => {
         email: user.email,
         base_currency: user.base_currency,
         language: user.language,
+        initial_balance: user.initial_balance,
       },
     });
   } catch (error) {

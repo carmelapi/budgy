@@ -15,12 +15,12 @@ export const findUserByEmail = async (email) => {
   return result.rows[0] || null;
 };
 
-export const createUser = async (email, password, base_currency, language) => {
+export const createUser = async (email, password, base_currency, language, initial_balance = 0) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
   const result = await pool.query(
-    'INSERT INTO users (email, password, base_currency, language) VALUES ($1, $2, $3, $4) RETURNING id, email, base_currency, language',
-    [email, hashedPassword, base_currency, language]
+    'INSERT INTO users (email, password, base_currency, language, initial_balance) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, base_currency, language, initial_balance',
+    [email, hashedPassword, base_currency, language, initial_balance]
   );
   return result.rows[0];
 };
@@ -29,7 +29,7 @@ export const verifyPassword = async (plain, hashed) => {
   return bcrypt.compare(plain, hashed);
 };
 
-export const updateSettings = async (userId, { base_currency, language }) => {
+export const updateSettings = async (userId, { base_currency, language, initial_balance }) => {
   const updates = [];
   const params = [];
   let paramCount = 0;
@@ -44,6 +44,11 @@ export const updateSettings = async (userId, { base_currency, language }) => {
     updates.push(`language = $${paramCount}`);
     params.push(language);
   }
+  if (initial_balance !== undefined) {
+    paramCount++;
+    updates.push(`initial_balance = $${paramCount}`);
+    params.push(initial_balance);
+  }
 
   if (updates.length === 0) return null;
 
@@ -52,7 +57,7 @@ export const updateSettings = async (userId, { base_currency, language }) => {
     UPDATE users
     SET ${updates.join(', ')}
     WHERE id = $${paramCount + 1}
-    RETURNING id, email, base_currency, language
+    RETURNING id, email, base_currency, language, initial_balance
   `;
   const result = await pool.query(query, params);
   return result.rows[0];

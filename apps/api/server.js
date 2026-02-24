@@ -6,6 +6,7 @@ import transactionRoutes from "./features/transactions/transactions.routes.js";
 import incomesRoutes from "./features/incomes/incomes.routes.js";
 import fixedCostsRoutes from "./features/fixed-costs/fixed-costs.routes.js";
 import monthlyOutcomesRoutes from "./features/monthly-outcomes/monthly-outcomes.routes.js";
+import dashboardRoutes from "./features/dashboard/dashboard.routes.js";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use("/api/transactions", transactionRoutes);
 app.use("/api/incomes", incomesRoutes);
 app.use("/api/fixed-costs", fixedCostsRoutes);
 app.use("/api/monthly-outcomes", monthlyOutcomesRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 app.get("/", (req, res) => res.send("API online"));
 
