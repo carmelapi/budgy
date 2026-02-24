@@ -8,6 +8,7 @@ export interface User {
   email: string;
   base_currency?: string;
   language?: string;
+  initial_balance?: number;
 }
 
 // Response from login/signup endpoints
