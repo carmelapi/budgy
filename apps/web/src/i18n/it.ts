@@ -79,6 +79,8 @@ export const it: TranslationKeys = {
       empty:
         "Nessun dato ancora — aggiungi entrate e uscite per vedere il riepilogo",
       loading: "Caricamento dashboard...",
+      editBalanceTitle: "Modifica Saldo Bancario",
+      balanceAmount: "Importo (kr)",
     },
   },
 
