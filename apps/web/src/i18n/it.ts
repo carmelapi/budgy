@@ -70,6 +70,12 @@ export const it: TranslationKeys = {
 
   dashboard: {
     title: "Dashboard",
+    chart: {
+      title: "Andamento Mensile",
+      totalAccount: "Totale Conto",
+      loading: "Caricamento grafico...",
+      empty: "Nessun dato ancora — aggiungi entrate e uscite per vedere il grafico",
+    },
     table: {
       title: "Riepilogo Dashboard",
       month: "Mese",
@@ -79,6 +85,8 @@ export const it: TranslationKeys = {
       empty:
         "Nessun dato ancora — aggiungi entrate e uscite per vedere il riepilogo",
       loading: "Caricamento dashboard...",
+      editBalanceTitle: "Modifica Saldo Bancario",
+      balanceAmount: "Saldo (kr)",
     },
   },
 
