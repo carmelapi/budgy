@@ -3,6 +3,7 @@ import Input from "@mui/material/Input";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,52 +15,39 @@ export default function LoginPage() {
 
   const navigate = useNavigate();
   const { login, signup, isAuthenticated, isLoading, error } = useAuth();
+  const { t } = useTranslation();
 
-  /**
-   * If user is already authenticated, redirect to dashboard
-   * This prevents logged-in users from seeing the login page
-   */
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
-  /**
-   * Handle login button click
-   */
   const handleLogin = async () => {
     setLocalError(null);
 
-    // Basic validation
     if (!email || !password) {
-      setLocalError("Please enter both email and password");
+      setLocalError(t.auth.errors.bothRequired);
       return;
     }
 
     try {
       await login(email, password);
-      // Navigation happens automatically via useEffect when isAuthenticated changes
     } catch (err) {
-      // Error is already set in AuthContext, but we can add local handling if needed
       console.error("Login failed:", err);
     }
   };
 
-  /**
-   * Handle signup button click
-   */
   const handleSignUp = async () => {
     setLocalError(null);
 
-    // Basic validation
     if (!email || !password) {
-      setLocalError("Please enter both email and password");
+      setLocalError(t.auth.errors.bothRequired);
       return;
     }
 
     if (password.length < 6) {
-      setLocalError("Password must be at least 6 characters");
+      setLocalError(t.auth.errors.passwordLength);
       return;
     }
 
@@ -70,49 +58,38 @@ export default function LoginPage() {
     }
   };
 
-  /**
-   * Handle Enter key press to submit form
-   * Using onKeyDown instead of deprecated onKeyPress
-   */
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
       mode === "login" ? handleLogin() : handleSignUp();
     }
   };
 
-  /**
-   * Toggle between login and signup modes
-   */
   const toggleMode = () => {
     setMode(mode === "login" ? "signup" : "login");
-    setLocalError(null); // Clear errors when switching modes
+    setLocalError(null);
   };
 
-  // Display error from AuthContext or local error
   const displayError = error || localError;
 
   return (
     <div className="flex flex-col w-full h-screen justify-center items-center bg-gray-50">
       <div className="flex flex-col justify-center items-center gap-6 bg-white rounded-lg shadow-md w-96 p-8">
-        {/* Title */}
         <h1 className="text-2xl font-bold text-gray-800">
-          {mode === "login" ? "Welcome Back" : "Create Account"}
+          {mode === "login" ? t.auth.login.title : t.auth.signup.title}
         </h1>
 
-        {/* Error message */}
         {displayError && (
           <Alert severity="error" className="w-full">
             {displayError}
           </Alert>
         )}
 
-        {/* Email input */}
         <FormControl className="w-full">
-          <FormLabel>Email</FormLabel>
+          <FormLabel>{t.auth.login.email}</FormLabel>
           <Input
             name="email"
             type="email"
-            placeholder="your@email.com"
+            placeholder={t.auth.login.emailPlaceholder}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -121,13 +98,12 @@ export default function LoginPage() {
           />
         </FormControl>
 
-        {/* Password input */}
         <FormControl className="w-full">
-          <FormLabel>Password</FormLabel>
+          <FormLabel>{t.auth.login.password}</FormLabel>
           <Input
             name="password"
             type="password"
-            placeholder="••••••••"
+            placeholder={t.auth.login.passwordPlaceholder}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -136,39 +112,36 @@ export default function LoginPage() {
           />
         </FormControl>
 
-        {/* Language selector (only for signup) */}
         {mode === "signup" && (
           <FormControl className="w-full">
-            <FormLabel>Language</FormLabel>
+            <FormLabel>{t.auth.signup.language}</FormLabel>
             <Select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
               disabled={isLoading}
               fullWidth
             >
-              <MenuItem value="EN">English</MenuItem>
-              <MenuItem value="IT">Italiano</MenuItem>
+              <MenuItem value="EN">{t.languages.EN}</MenuItem>
+              <MenuItem value="IT">{t.languages.IT}</MenuItem>
             </Select>
           </FormControl>
         )}
 
-        {/* Currency selector (only for signup) */}
         {mode === "signup" && (
           <FormControl className="w-full">
-            <FormLabel>Preferred Currency</FormLabel>
+            <FormLabel>{t.auth.signup.currency}</FormLabel>
             <Select
               value={baseCurrency}
               onChange={(e) => setBaseCurrency(e.target.value)}
               disabled={isLoading}
               fullWidth
             >
-              <MenuItem value="SEK">SEK - Swedish Krona</MenuItem>
-              <MenuItem value="EUR">EUR - Euro</MenuItem>
+              <MenuItem value="SEK">{t.currencies.SEK}</MenuItem>
+              <MenuItem value="EUR">{t.currencies.EUR}</MenuItem>
             </Select>
           </FormControl>
         )}
 
-        {/* Submit button */}
         <Button
           variant="contained"
           onClick={mode === "login" ? handleLogin : handleSignUp}
@@ -177,34 +150,33 @@ export default function LoginPage() {
           className="mt-2"
         >
           {isLoading
-            ? "Please wait..."
+            ? t.auth.loading
             : mode === "login"
-            ? "Login"
-            : "Sign Up"}
+            ? t.auth.login.submit
+            : t.auth.signup.signUp}
         </Button>
 
-        {/* Mode toggle */}
         <div className="text-sm text-gray-600">
           {mode === "login" ? (
             <>
-              Don't have an account?{" "}
+              {t.auth.login.noAccount}{" "}
               <button
                 onClick={toggleMode}
                 className="text-blue-600 hover:underline font-medium"
                 disabled={isLoading}
               >
-                Sign up
+                {t.auth.login.signUpLink}
               </button>
             </>
           ) : (
             <>
-              Already have an account?{" "}
+              {t.auth.signup.hasAccount}{" "}
               <button
                 onClick={toggleMode}
                 className="text-blue-600 hover:underline font-medium"
                 disabled={isLoading}
               >
-                Login
+                {t.auth.signup.loginLink}
               </button>
             </>
           )}

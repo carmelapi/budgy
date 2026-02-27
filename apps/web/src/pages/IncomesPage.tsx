@@ -20,33 +20,42 @@ import {
   MenuItem,
 } from "@mui/material";
 import { api } from "../utils/api";
+import { useTranslation } from "../hooks/useTranslation";
 import type { MonthlyIncome } from "../types/incomes-outcomes.types";
 
-// Generates months from 3 months ago to 6 months ahead for the Select dropdown
 function getMonthOptions() {
   const months = [];
   const today = new Date();
   for (let i = -3; i <= 6; i++) {
     const d = new Date(today.getFullYear(), today.getMonth() + i, 1);
     const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const label = d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    const label = d.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
     months.push({ value, label });
   }
   return months;
 }
 
 const IncomesPage: React.FC = () => {
+  const { t } = useTranslation();
+
   const [incomes, setIncomes] = useState<MonthlyIncome[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Edit dialog state — null means no row is selected (dialog closed)
-  const [editingIncome, setEditingIncome] = useState<MonthlyIncome | null>(null);
-  const [editForm, setEditForm] = useState({ month: "", salary: "", extra: "" });
+  const [editingIncome, setEditingIncome] = useState<MonthlyIncome | null>(
+    null,
+  );
+  const [editForm, setEditForm] = useState({
+    month: "",
+    salary: "",
+    extra: "",
+  });
   const [editError, setEditError] = useState<string | null>(null);
   const [editSubmitting, setEditSubmitting] = useState(false);
 
-  // Extracted so we can call it again after a successful edit
   const fetchIncomes = async () => {
     try {
       setLoading(true);
@@ -73,10 +82,12 @@ const IncomesPage: React.FC = () => {
   const formatMonth = (month: string): string => {
     const [year, monthNum] = month.split("-");
     const date = new Date(parseInt(year), parseInt(monthNum) - 1);
-    return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      year: "numeric",
+    });
   };
 
-  // Opens the edit dialog pre-filled with the clicked row's data
   const handleRowClick = (income: MonthlyIncome) => {
     setEditingIncome(income);
     setEditForm({
@@ -97,15 +108,15 @@ const IncomesPage: React.FC = () => {
     if (!editingIncome) return;
 
     if (!editForm.month) {
-      setEditError("Month is required");
+      setEditError(t.incomes.errors.monthRequired);
       return;
     }
     if (editForm.salary === "" || parseFloat(editForm.salary) < 0) {
-      setEditError("Salary must be 0 or greater");
+      setEditError(t.incomes.errors.salaryMin);
       return;
     }
     if (editForm.extra === "" || parseFloat(editForm.extra) < 0) {
-      setEditError("Extra must be 0 or greater");
+      setEditError(t.incomes.errors.extraMin);
       return;
     }
 
@@ -119,14 +130,15 @@ const IncomesPage: React.FC = () => {
         extra: parseFloat(editForm.extra),
       });
 
-      // Re-fetch so the table shows fresh data without a full page reload
       const response = await api.get("/api/incomes");
       setIncomes(response.incomes);
 
       handleCloseEdit();
     } catch (err) {
       console.error("Error updating income:", err);
-      setEditError(err instanceof Error ? err.message : "Failed to update income");
+      setEditError(
+        err instanceof Error ? err.message : "Failed to update income",
+      );
     } finally {
       setEditSubmitting(false);
     }
@@ -135,98 +147,118 @@ const IncomesPage: React.FC = () => {
   return (
     <>
       <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
-          <h1 className="text-2xl font-bold text-gray-800">Monthly Incomes</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{t.incomes.title}</h1>
 
-          {loading && (
-            <div className="flex justify-center items-center py-8">
-              <CircularProgress />
-              <span className="ml-3 text-gray-600">Loading incomes...</span>
-            </div>
-          )}
+        {loading && (
+          <div className="flex justify-center items-center py-8">
+            <CircularProgress />
+            <span className="ml-3 text-gray-600">{t.incomes.loading}</span>
+          </div>
+        )}
 
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-              <strong>Error:</strong> {error}
-            </div>
-          )}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+            <strong>{t.errors.errorPrefix}:</strong> {error}
+          </div>
+        )}
 
-          {!loading && !error && (
-            <TableContainer component={Paper} className="shadow-md">
-              <Table>
-                <TableHead>
-                  <TableRow sx={{ backgroundColor: "#f3f4f6" }}>
-                    <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
-                      Month
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: "16px" }} align="right">
-                      Salary (kr)
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: "16px" }} align="right">
-                      Extra (kr)
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 600, fontSize: "16px" }} align="right">
-                      Total (kr)
+        {!loading && !error && (
+          <TableContainer component={Paper} className="shadow-md">
+            <Table>
+              <TableHead>
+                <TableRow sx={{ backgroundColor: "#beffd2" }}>
+                  <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
+                    {t.incomes.table.month}
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: 600, fontSize: "16px" }}
+                    align="right"
+                  >
+                    {t.incomes.table.salary}
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: 600, fontSize: "16px" }}
+                    align="right"
+                  >
+                    {t.incomes.table.extra}
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontWeight: 600, fontSize: "16px" }}
+                    align="right"
+                  >
+                    {t.incomes.table.total}
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {incomes.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      align="center"
+                      sx={{ py: 6, color: "#9ca3af" }}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-lg">{t.incomes.empty.title}</span>
+                        <span className="text-sm">
+                          {t.incomes.empty.subtitle}
+                        </span>
+                      </div>
                     </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {incomes.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={4} align="center" sx={{ py: 6, color: "#9ca3af" }}>
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="text-lg">No income data yet</span>
-                          <span className="text-sm">
-                            Start by adding your first monthly income
-                          </span>
-                        </div>
+                ) : (
+                  incomes.map((income) => (
+                    <TableRow
+                      key={income.id}
+                      onClick={() => handleRowClick(income)}
+                      sx={{
+                        cursor: "pointer",
+                        "&:hover": { backgroundColor: "#f9fafb" },
+                        transition: "background-color 0.2s",
+                      }}
+                    >
+                      <TableCell sx={{ fontSize: "15px" }}>
+                        {formatMonth(income.month)}
                       </TableCell>
-                    </TableRow>
-                  ) : (
-                    incomes.map((income) => (
-                      <TableRow
-                        key={income.id}
-                        onClick={() => handleRowClick(income)}
+                      <TableCell align="right" sx={{ fontSize: "15px" }}>
+                        {formatCurrency(income.salary)}
+                      </TableCell>
+                      <TableCell align="right" sx={{ fontSize: "15px" }}>
+                        {formatCurrency(income.extra)}
+                      </TableCell>
+                      <TableCell
+                        align="right"
                         sx={{
-                          cursor: "pointer",
-                          "&:hover": { backgroundColor: "#f9fafb" },
-                          transition: "background-color 0.2s",
+                          fontSize: "15px",
+                          fontWeight: 600,
+                          color: "#059669",
                         }}
                       >
-                        <TableCell sx={{ fontSize: "15px" }}>
-                          {formatMonth(income.month)}
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontSize: "15px" }}>
-                          {formatCurrency(income.salary)}
-                        </TableCell>
-                        <TableCell align="right" sx={{ fontSize: "15px" }}>
-                          {formatCurrency(income.extra)}
-                        </TableCell>
-                        <TableCell
-                          align="right"
-                          sx={{ fontSize: "15px", fontWeight: 600, color: "#059669" }}
-                        >
-                          {formatCurrency(income.total)}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </div>
+                        {formatCurrency(income.total)}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </div>
 
-      {/* Edit Income Dialog */}
-
-      <Dialog open={!!editingIncome} onClose={handleCloseEdit} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Income</DialogTitle>
+      <Dialog
+        open={!!editingIncome}
+        onClose={handleCloseEdit}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{t.incomes.dialog.editTitle}</DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-4 mt-2">
             <FormControl fullWidth>
-              <InputLabel>Month</InputLabel>
+              <InputLabel>{t.incomes.dialog.month}</InputLabel>
               <Select
                 value={editForm.month}
-                label="Month"
+                label={t.incomes.dialog.month}
                 onChange={(e) =>
                   setEditForm((prev) => ({ ...prev, month: e.target.value }))
                 }
@@ -240,7 +272,7 @@ const IncomesPage: React.FC = () => {
             </FormControl>
 
             <TextField
-              label="Salary (kr)"
+              label={t.incomes.dialog.salary}
               type="number"
               value={editForm.salary}
               onChange={(e) =>
@@ -251,7 +283,7 @@ const IncomesPage: React.FC = () => {
             />
 
             <TextField
-              label="Extra (kr)"
+              label={t.incomes.dialog.extra}
               type="number"
               value={editForm.extra}
               onChange={(e) =>
@@ -270,10 +302,14 @@ const IncomesPage: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseEdit} disabled={editSubmitting}>
-            Cancel
+            {t.incomes.dialog.cancel}
           </Button>
-          <Button onClick={handleEditSubmit} variant="contained" disabled={editSubmitting}>
-            {editSubmitting ? "Saving..." : "Save"}
+          <Button
+            onClick={handleEditSubmit}
+            variant="contained"
+            disabled={editSubmitting}
+          >
+            {editSubmitting ? t.incomes.dialog.saving : t.incomes.dialog.save}
           </Button>
         </DialogActions>
       </Dialog>

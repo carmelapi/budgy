@@ -1,7 +1,9 @@
 import { Link, useLocation } from "react-router-dom";
+import { useTranslation } from "../hooks/useTranslation";
 
 export default function Sidebar() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const isActive = (path: string): boolean => {
     return location.pathname === path;
@@ -9,7 +11,6 @@ export default function Sidebar() {
 
   return (
     <div className="bg-gray-100 flex flex-col w-1/6 p-4 gap-2">
-      {/* Dashboard Link */}
       <Link
         to="/dashboard"
         className={`px-4 py-3 rounded-lg transition-colors ${
@@ -18,10 +19,9 @@ export default function Sidebar() {
             : "text-gray-700 hover:bg-gray-200"
         }`}
       >
-        Dashboard
+        {t.sidebar.dashboard}
       </Link>
 
-      {/* Incomes Link */}
       <Link
         to="/incomes"
         className={`px-4 py-3 rounded-lg transition-colors ${
@@ -30,10 +30,9 @@ export default function Sidebar() {
             : " text-gray-700 hover:bg-gray-200"
         }`}
       >
-        Incomes
+        {t.sidebar.incomes}
       </Link>
 
-      {/* Outcomes Link */}
       <Link
         to="/outcomes"
         className={`px-4 py-3 rounded-lg transition-colors ${
@@ -42,7 +41,7 @@ export default function Sidebar() {
             : "text-gray-700 hover:bg-gray-200"
         }`}
       >
-        Outcomes
+        {t.sidebar.outcomes}
       </Link>
     </div>
   );

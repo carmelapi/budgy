@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import { api } from "../utils/api";
+import { useTranslation } from "../hooks/useTranslation";
 
 /** Generates month options for ±3 months from today (e.g. "Jan 2026") */
 function getMonthOptions() {
@@ -37,6 +38,7 @@ export default function Navbar() {
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
   const [saving, setSaving] = useState(false);
   const { user, logout, updateSettings } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // ── Add dialog state ──────────────────────────────────────────────────────
@@ -106,7 +108,7 @@ export default function Navbar() {
       // Refresh the current page so the new row appears in the table
       navigate(0);
     } catch (err: any) {
-      setAddError(err.message || "Something went wrong");
+      setAddError(err.message || t.navbar.addDialog.somethingWentWrong);
     } finally {
       setAddSubmitting(false);
     }
@@ -153,18 +155,18 @@ export default function Navbar() {
             onClick={handleOpenSettings}
             className="text-sm text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
           >
-            Welcome, <span className="font-medium">{user.email}</span>
+            {t.navbar.welcome}, <span className="font-medium">{user.email}</span>
           </button>
         )}
 
         {/* Add button */}
         <Button variant="outlined" onClick={handleClickOpen}>
-          Add
+          {t.navbar.add}
         </Button>
 
         {/* Logout button */}
         <Button variant="outlined" color="error" onClick={handleLogout}>
-          Logout
+          {t.navbar.logout}
         </Button>
       </div>
 
@@ -174,7 +176,7 @@ export default function Navbar() {
         {/* ── Step 1: Choose type ─────────────────────────────────── */}
         {addStep === "choose" && (
           <>
-            <DialogTitle>What do you want to add?</DialogTitle>
+            <DialogTitle>{t.navbar.addDialog.chooseTitle}</DialogTitle>
             <DialogContent>
               <div className="flex flex-col gap-3 mt-2">
                 <Button
@@ -182,26 +184,26 @@ export default function Navbar() {
                   fullWidth
                   onClick={() => setAddStep("income")}
                 >
-                  Income
+                  {t.navbar.addDialog.income}
                 </Button>
                 <Button
                   variant="outlined"
                   fullWidth
                   onClick={() => setAddStep("outcome")}
                 >
-                  Outcome
+                  {t.navbar.addDialog.outcome}
                 </Button>
                 <Button
                   variant="outlined"
                   fullWidth
                   onClick={() => setAddStep("balance")}
                 >
-                  Bank Account Balance
+                  {t.navbar.addDialog.bankBalance}
                 </Button>
               </div>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>{t.navbar.addDialog.cancel}</Button>
             </DialogActions>
           </>
         )}
@@ -209,12 +211,12 @@ export default function Navbar() {
         {/* ── Step 2a: Income form ────────────────────────────────── */}
         {addStep === "income" && (
           <>
-            <DialogTitle>Add Income</DialogTitle>
+            <DialogTitle>{t.navbar.addDialog.addIncomeTitle}</DialogTitle>
             <DialogContent>
               <div className="flex flex-col gap-4 mt-2">
                 {/* Month picker */}
                 <FormControl fullWidth>
-                  <FormLabel>Month</FormLabel>
+                  <FormLabel>{t.navbar.addDialog.month}</FormLabel>
                   <Select
                     value={incomeForm.month}
                     onChange={(e) => setIncomeForm({ ...incomeForm, month: e.target.value })}
@@ -227,7 +229,7 @@ export default function Navbar() {
                 </FormControl>
 
                 <TextField
-                  label="Salary"
+                  label={t.navbar.addDialog.salary}
                   type="number"
                   fullWidth
                   value={incomeForm.salary}
@@ -236,7 +238,7 @@ export default function Navbar() {
                 />
 
                 <TextField
-                  label="Extra"
+                  label={t.navbar.addDialog.extra}
                   type="number"
                   fullWidth
                   value={incomeForm.extra}
@@ -249,13 +251,13 @@ export default function Navbar() {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>Back</Button>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>{t.navbar.addDialog.back}</Button>
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
                 disabled={addSubmitting || !incomeForm.month}
               >
-                {addSubmitting ? "Saving..." : "Save"}
+                {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
             </DialogActions>
           </>
@@ -264,12 +266,12 @@ export default function Navbar() {
         {/* ── Step 2b: Outcome form ───────────────────────────────── */}
         {addStep === "outcome" && (
           <>
-            <DialogTitle>Add Outcome</DialogTitle>
+            <DialogTitle>{t.navbar.addDialog.addOutcomeTitle}</DialogTitle>
             <DialogContent>
               <div className="flex flex-col gap-4 mt-2">
                 {/* Month picker */}
                 <FormControl fullWidth>
-                  <FormLabel>Month</FormLabel>
+                  <FormLabel>{t.navbar.addDialog.month}</FormLabel>
                   <Select
                     value={outcomeForm.month}
                     onChange={(e) => setOutcomeForm({ ...outcomeForm, month: e.target.value })}
@@ -282,7 +284,7 @@ export default function Navbar() {
                 </FormControl>
 
                 <TextField
-                  label="Loan / Avgift"
+                  label={t.navbar.addDialog.loanAvgift}
                   type="number"
                   fullWidth
                   value={outcomeForm.avgift_loan}
@@ -291,7 +293,7 @@ export default function Navbar() {
                 />
 
                 <TextField
-                  label="Debt"
+                  label={t.navbar.addDialog.debt}
                   type="number"
                   fullWidth
                   value={outcomeForm.debt}
@@ -300,7 +302,7 @@ export default function Navbar() {
                 />
 
                 <TextField
-                  label="Extra"
+                  label={t.navbar.addDialog.extra}
                   type="number"
                   fullWidth
                   value={outcomeForm.extra}
@@ -312,13 +314,13 @@ export default function Navbar() {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>Back</Button>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>{t.navbar.addDialog.back}</Button>
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
                 disabled={addSubmitting || !outcomeForm.month}
               >
-                {addSubmitting ? "Saving..." : "Save"}
+                {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
             </DialogActions>
           </>
@@ -327,11 +329,11 @@ export default function Navbar() {
         {/* ── Step 2c: Bank Account Balance form ─────────────────── */}
         {addStep === "balance" && (
           <>
-            <DialogTitle>Add Bank Account Balance</DialogTitle>
+            <DialogTitle>{t.navbar.addDialog.addBankBalanceTitle}</DialogTitle>
             <DialogContent>
               <div className="flex flex-col gap-4 mt-2">
                 <FormControl fullWidth>
-                  <FormLabel>Month</FormLabel>
+                  <FormLabel>{t.navbar.addDialog.month}</FormLabel>
                   <Select
                     value={balanceForm.month}
                     onChange={(e) => setBalanceForm({ ...balanceForm, month: e.target.value })}
@@ -344,7 +346,7 @@ export default function Navbar() {
                 </FormControl>
 
                 <TextField
-                  label="Amount on account"
+                  label={t.navbar.addDialog.amountOnAccount}
                   type="number"
                   fullWidth
                   value={balanceForm.amount}
@@ -357,13 +359,13 @@ export default function Navbar() {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>Back</Button>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>{t.navbar.addDialog.back}</Button>
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
                 disabled={addSubmitting || !balanceForm.month || !balanceForm.amount}
               >
-                {addSubmitting ? "Saving..." : "Save"}
+                {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
             </DialogActions>
           </>
@@ -373,40 +375,40 @@ export default function Navbar() {
       {/* ─────────────────────────────────────────────────────────────────────── */}
 
       <Dialog open={settingsOpen} onClose={handleCloseSettings} maxWidth="sm" fullWidth>
-        <DialogTitle>Settings</DialogTitle>
+        <DialogTitle>{t.navbar.settings.title}</DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-4 mt-2">
             <FormControl fullWidth>
-              <FormLabel>Language</FormLabel>
+              <FormLabel>{t.navbar.settings.language}</FormLabel>
               <Select
                 value={selectedLanguage}
                 onChange={(e) => setSelectedLanguage(e.target.value)}
                 disabled={saving}
               >
-                <MenuItem value="EN">English</MenuItem>
-                <MenuItem value="IT">Italiano</MenuItem>
+                <MenuItem value="EN">{t.languages.EN}</MenuItem>
+                <MenuItem value="IT">{t.languages.IT}</MenuItem>
               </Select>
             </FormControl>
 
             <FormControl fullWidth>
-              <FormLabel>Currency</FormLabel>
+              <FormLabel>{t.navbar.settings.currency}</FormLabel>
               <Select
                 value={selectedCurrency}
                 onChange={(e) => setSelectedCurrency(e.target.value)}
                 disabled={saving}
               >
-                <MenuItem value="SEK">SEK - Swedish Krona</MenuItem>
-                <MenuItem value="EUR">EUR - Euro</MenuItem>
+                <MenuItem value="SEK">{t.currencies.SEK}</MenuItem>
+                <MenuItem value="EUR">{t.currencies.EUR}</MenuItem>
               </Select>
             </FormControl>
           </div>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseSettings} disabled={saving}>
-            Cancel
+            {t.navbar.settings.cancel}
           </Button>
           <Button onClick={handleSaveSettings} variant="contained" disabled={saving}>
-            {saving ? "Saving..." : "Save"}
+            {saving ? t.navbar.settings.saving : t.navbar.settings.save}
           </Button>
         </DialogActions>
       </Dialog>
