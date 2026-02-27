@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { api } from '../utils/api';
+import { useTranslation } from '../hooks/useTranslation';
 import type { MonthlyIncome, MonthlyOutcome, FixedCost } from '../types/incomes-outcomes.types';
 
 interface AccountBalance {
@@ -63,6 +64,7 @@ const getPreviousMonth = (month: string): string => {
 };
 
 export default function DashboardTable() {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<DashboardRow[]>([]);
 
@@ -144,27 +146,27 @@ export default function DashboardTable() {
     return (
       <div className="flex justify-center items-center py-8">
         <CircularProgress size={24} />
-        <span className="ml-3 text-gray-600">Loading dashboard...</span>
+        <span className="ml-3 text-gray-600">{t.dashboard.table.loading}</span>
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-3 text-gray-800">Dashboard Summary</h2>
+      <h2 className="text-xl font-semibold mb-3 text-gray-800">{t.dashboard.table.title}</h2>
       <TableContainer component={Paper} className="shadow-md">
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: '#f0fdf4' }}>
-              <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>Month</TableCell>
+              <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>{t.dashboard.table.month}</TableCell>
               <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                Total Incomes
+                {t.dashboard.table.totalIncomes}
               </TableCell>
               <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                Final Total (Table 3)
+                {t.dashboard.table.finalTotal}
               </TableCell>
               <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                Total Account
+                {t.dashboard.table.totalAccount}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -172,7 +174,7 @@ export default function DashboardTable() {
             {rows.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 6, color: '#9ca3af' }}>
-                  No data yet — add income and outcome data to see the summary
+                  {t.dashboard.table.empty}
                 </TableCell>
               </TableRow>
             ) : (
