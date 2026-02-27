@@ -39,7 +39,7 @@ export const getFixedCostById = async (req, res) => {
 
 export const createFixedCost = async (req, res) => {
   try {
-    const { description, amount, currency = 'SEK' } = req.body;
+    const { description, amount, currency = 'SEK', payment_source = null } = req.body;
 
     if (!description || amount === undefined) {
       return res.status(400).json({ message: 'Description and amount are required' });
@@ -48,7 +48,7 @@ export const createFixedCost = async (req, res) => {
     const errors = validateFixedCostData(req.body);
     if (errors.length > 0) return res.status(400).json({ message: 'Validation failed', errors });
 
-    const fixedCost = await fixedCostsService.create(req.user.userId, { description, amount, currency });
+    const fixedCost = await fixedCostsService.create(req.user.userId, { description, amount, currency, payment_source });
     res.status(201).json({ fixedCost });
   } catch (error) {
     console.error('Error creating fixed cost:', error);
@@ -58,8 +58,8 @@ export const createFixedCost = async (req, res) => {
 
 export const updateFixedCost = async (req, res) => {
   try {
-    const { description, amount, currency } = req.body;
-    const fields = { description, amount, currency };
+    const { description, amount, currency, payment_source } = req.body;
+    const fields = { description, amount, currency, payment_source };
 
     const errors = validateFixedCostData(fields);
     if (errors.length > 0) return res.status(400).json({ message: 'Validation failed', errors });
