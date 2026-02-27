@@ -68,14 +68,22 @@ export const en = {
 
   dashboard: {
     title: "Dashboard",
+    chart: {
+      title: "Monthly Progress",
+      totalAccount: "Total Account",
+      loading: "Loading chart...",
+      empty: "No data yet — add income and outcome data to see the chart",
+    },
     table: {
       title: "Dashboard Summary",
       month: "Month",
-      totalIncomes: "Total Incomes",
-      finalTotal: "Final Total (Table 3)",
+      totalIncomes: " Incomes",
+      finalTotal: "Outcomes",
       totalAccount: "Total Account",
       empty: "No data yet — add income and outcome data to see the summary",
       loading: "Loading dashboard...",
+      editBalanceTitle: "Edit Bank Balance",
+      balanceAmount: "Balance (kr)",
     },
   },
 
