@@ -1,9 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { LineChart } from '@mui/x-charts/LineChart';
-import { CircularProgress, Paper } from '@mui/material';
-import { api } from '../utils/api';
-import { useTranslation } from '../hooks/useTranslation';
-import type { MonthlyIncome, MonthlyOutcome, FixedCost } from '../types/incomes-outcomes.types';
+import { useState, useEffect, useCallback } from "react";
+import { LineChart } from "@mui/x-charts/LineChart";
+import { CircularProgress, Paper } from "@mui/material";
+import { api } from "../utils/api";
+import { useTranslation } from "../hooks/useTranslation";
+import type {
+  MonthlyIncome,
+  MonthlyOutcome,
+  FixedCost,
+} from "../types/incomes-outcomes.types";
 
 interface AccountBalance {
   id: number;
@@ -13,15 +17,15 @@ interface AccountBalance {
 }
 
 const formatMonth = (month: string): string => {
-  const [year, monthNum] = month.split('-');
+  const [year, monthNum] = month.split("-");
   const date = new Date(parseInt(year), parseInt(monthNum) - 1);
-  return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 };
 
 const calcFinalTotal = (
   income: MonthlyIncome,
   outcome: MonthlyOutcome,
-  fixedCostsTotal: number
+  fixedCostsTotal: number,
 ): number => {
   const incomesTotal = parseFloat(income.total);
   const outcomesTotal =
@@ -37,9 +41,9 @@ const calcFinalTotal = (
 };
 
 const getPreviousMonth = (month: string): string => {
-  const [year, monthNum] = month.split('-').map(Number);
+  const [year, monthNum] = month.split("-").map(Number);
   const date = new Date(year, monthNum - 2, 1);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 };
 
 export default function Chart() {
@@ -52,27 +56,36 @@ export default function Chart() {
     try {
       setLoading(true);
 
-      const [incomesRes, outcomesRes, fixedCostsRes, balancesRes] = await Promise.all([
-        api.get('/api/incomes'),
-        api.get('/api/monthly-outcomes'),
-        api.get('/api/fixed-costs'),
-        api.get('/api/account-balances'),
-      ]);
+      const [incomesRes, outcomesRes, fixedCostsRes, balancesRes] =
+        await Promise.all([
+          api.get("/api/incomes"),
+          api.get("/api/monthly-outcomes"),
+          api.get("/api/fixed-costs"),
+          api.get("/api/account-balances"),
+        ]);
 
       const incomes: MonthlyIncome[] = incomesRes.incomes ?? [];
       const outcomes: MonthlyOutcome[] = outcomesRes.monthlyOutcomes ?? [];
       const fixedCosts: FixedCost[] = fixedCostsRes.fixedCosts ?? [];
       const balances: AccountBalance[] = balancesRes.balances ?? [];
 
-      const fixedCostsTotal = fixedCosts.reduce((sum, fc) => sum + parseFloat(fc.amount), 0);
+      const fixedCostsTotal = fixedCosts.reduce(
+        (sum, fc) => sum + parseFloat(fc.amount),
+        0,
+      );
 
       const incomeMap = new Map(incomes.map((i) => [i.month, i]));
       const outcomeMap = new Map(outcomes.map((o) => [o.month, o]));
-      const balanceMap = new Map(balances.map((b) => [b.month, parseFloat(b.amount)]));
+      const balanceMap = new Map(
+        balances.map((b) => [b.month, parseFloat(b.amount)]),
+      );
 
       // Oldest → newest for left-to-right chart flow
       const allMonths = Array.from(
-        new Set([...incomes.map((i) => i.month), ...outcomes.map((o) => o.month)])
+        new Set([
+          ...incomes.map((i) => i.month),
+          ...outcomes.map((o) => o.month),
+        ]),
       ).sort();
 
       const filteredMonths: string[] = [];
@@ -98,7 +111,7 @@ export default function Chart() {
       setMonths(filteredMonths);
       setTotalAccounts(filteredTotals);
     } catch (err) {
-      console.error('[Chart] Error fetching data:', err);
+      console.error("[Chart] Error fetching data:", err);
     } finally {
       setLoading(false);
     }
@@ -110,7 +123,7 @@ export default function Chart() {
 
   if (loading) {
     return (
-      <Paper className="flex-1 p-5 flex justify-center items-center min-h-[280px]">
+      <Paper className="flex-1 p-5 flex justify-center items-center min-h-70">
         <CircularProgress size={24} />
         <span className="ml-3 text-gray-600">{t.dashboard.chart.loading}</span>
       </Paper>
@@ -119,7 +132,7 @@ export default function Chart() {
 
   if (months.length === 0) {
     return (
-      <Paper className="flex-1 p-5 flex justify-center items-center min-h-[280px]">
+      <Paper className="flex-1 p-5 flex justify-center items-center min-h-70">
         <span className="text-gray-400 text-sm">{t.dashboard.chart.empty}</span>
       </Paper>
     );
@@ -127,14 +140,16 @@ export default function Chart() {
 
   return (
     <Paper className="flex-1 p-5">
-      <h2 className="text-xl font-semibold mb-2 text-gray-800">{t.dashboard.chart.title}</h2>
+      <h2 className="text-xl font-semibold mb-2 text-gray-800">
+        {t.dashboard.chart.title}
+      </h2>
       <LineChart
-        xAxis={[{ scaleType: 'point', data: months }]}
+        xAxis={[{ scaleType: "point", data: months }]}
         series={[
           {
             data: totalAccounts,
             label: t.dashboard.chart.totalAccount,
-            color: '#16a34a',
+            color: "#16a34a",
             showMark: true,
           },
         ]}
