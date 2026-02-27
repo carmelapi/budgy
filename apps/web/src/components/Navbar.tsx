@@ -281,20 +281,13 @@ export default function Navbar() {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button
-                onClick={() => setAddStep("choose")}
-                disabled={addSubmitting}
-              >
-                {t.navbar.addDialog.back}
-              </Button>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>{t.navbar.addDialog.back}</Button>
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
                 disabled={addSubmitting || !incomeForm.month}
               >
-                {addSubmitting
-                  ? t.navbar.settings.saving
-                  : t.navbar.settings.save}
+                {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
             </DialogActions>
           </>
@@ -364,20 +357,13 @@ export default function Navbar() {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button
-                onClick={() => setAddStep("choose")}
-                disabled={addSubmitting}
-              >
-                {t.navbar.addDialog.back}
-              </Button>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>{t.navbar.addDialog.back}</Button>
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
                 disabled={addSubmitting || !outcomeForm.month}
               >
-                {addSubmitting
-                  ? t.navbar.settings.saving
-                  : t.navbar.settings.save}
+                {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
             </DialogActions>
           </>
@@ -422,12 +408,7 @@ export default function Navbar() {
               </div>
             </DialogContent>
             <DialogActions>
-              <Button
-                onClick={() => setAddStep("choose")}
-                disabled={addSubmitting}
-              >
-                {t.navbar.addDialog.back}
-              </Button>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>{t.navbar.addDialog.back}</Button>
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
@@ -435,9 +416,7 @@ export default function Navbar() {
                   addSubmitting || !balanceForm.month || !balanceForm.amount
                 }
               >
-                {addSubmitting
-                  ? t.navbar.settings.saving
-                  : t.navbar.settings.save}
+                {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
             </DialogActions>
           </>
@@ -445,12 +424,7 @@ export default function Navbar() {
       </Dialog>
       {/* ─────────────────────────────────────────────────────────────────────── */}
 
-      <Dialog
-        open={settingsOpen}
-        onClose={handleCloseSettings}
-        maxWidth="sm"
-        fullWidth
-      >
+      <Dialog open={settingsOpen} onClose={handleCloseSettings} maxWidth="sm" fullWidth>
         <DialogTitle>{t.navbar.settings.title}</DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-4 mt-2">
@@ -483,11 +457,7 @@ export default function Navbar() {
           <Button onClick={handleCloseSettings} disabled={saving}>
             {t.navbar.settings.cancel}
           </Button>
-          <Button
-            onClick={handleSaveSettings}
-            variant="contained"
-            disabled={saving}
-          >
+          <Button onClick={handleSaveSettings} variant="contained" disabled={saving}>
             {saving ? t.navbar.settings.saving : t.navbar.settings.save}
           </Button>
         </DialogActions>

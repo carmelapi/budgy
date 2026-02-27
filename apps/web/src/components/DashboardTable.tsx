@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Table,
   TableBody,
@@ -188,6 +189,80 @@ export default function DashboardTable() {
     }
   };
 
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        setLoading(true);
+
+        const [incomesRes, outcomesRes, fixedCostsRes, balancesRes] = await Promise.all([
+          api.get('/api/incomes'),
+          api.get('/api/monthly-outcomes'),
+          api.get('/api/fixed-costs'),
+          api.get('/api/account-balances'),
+        ]);
+
+        const incomes: MonthlyIncome[] = incomesRes.incomes ?? [];
+        const outcomes: MonthlyOutcome[] = outcomesRes.monthlyOutcomes ?? [];
+        const fixedCosts: FixedCost[] = fixedCostsRes.fixedCosts ?? [];
+        const balances: AccountBalance[] = balancesRes.balances ?? [];
+
+        const fixedCostsTotal = fixedCosts.reduce((sum, fc) => sum + parseFloat(fc.amount), 0);
+
+        if (!incomes.length) console.log('[DashboardTable] No incomes data');
+        if (!outcomes.length) console.log('[DashboardTable] No monthly outcomes data');
+        if (!fixedCosts.length) console.log('[DashboardTable] No fixed costs data');
+        if (!balances.length) console.log('[DashboardTable] No account balances data');
+
+        const incomeMap = new Map(incomes.map((i) => [i.month, i]));
+        const outcomeMap = new Map(outcomes.map((o) => [o.month, o]));
+        const balanceMap = new Map(balances.map((b) => [b.month, parseFloat(b.amount)]));
+
+        // Union of all months from incomes + outcomes, newest first
+        const allMonths = Array.from(
+          new Set([...incomes.map((i) => i.month), ...outcomes.map((o) => o.month)])
+        ).sort().reverse();
+
+        if (!allMonths.length) console.log('[DashboardTable] No months found across incomes or outcomes');
+
+        const builtRows: DashboardRow[] = allMonths.map((month) => {
+          const income = incomeMap.get(month);
+          const outcome = outcomeMap.get(month);
+
+          if (!income) console.log(`[DashboardTable] Missing income for month ${month}`);
+          if (!outcome) console.log(`[DashboardTable] Missing monthly outcome for month ${month}`);
+
+          const totalIncomes = income ? parseFloat(income.total) : null;
+          const finalTotal =
+            income && outcome ? calcFinalTotal(income, outcome, fixedCostsTotal) : null;
+
+          const prevMonth = getPreviousMonth(month);
+          const prevBalance = balanceMap.get(prevMonth);
+
+          if (prevBalance === undefined) {
+            console.log(
+              `[DashboardTable] No account balance for previous month (${prevMonth}) — needed for Total Account of ${month}`
+            );
+          }
+
+          let totalAccount: number | null = null;
+          if (prevBalance !== undefined && totalIncomes !== null && finalTotal !== null) {
+            totalAccount = prevBalance + (totalIncomes - finalTotal);
+          }
+
+          return { month, totalIncomes, finalTotal, totalAccount };
+        });
+
+        setRows(builtRows);
+      } catch (err) {
+        console.error('[DashboardTable] Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAll();
+  }, []);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -233,6 +308,7 @@ export default function DashboardTable() {
                     '&:hover': { backgroundColor: '#f0fdf4' },
                     transition: 'background-color 0.2s',
                   }}
+                  sx={{ '&:hover': { backgroundColor: '#f9fafb' }, transition: 'background-color 0.2s' }}
                 >
                   <TableCell sx={{ fontSize: '15px' }}>{formatMonth(row.month)}</TableCell>
                   <TableCell align="right" sx={{ fontSize: '15px' }}>
