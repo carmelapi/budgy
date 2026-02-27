@@ -68,6 +68,15 @@ export const en = {
 
   dashboard: {
     title: "Dashboard",
+    todo: {
+      title: "This Month's Actions",
+      transferRevolut: "Transfer to Revolut",
+      transferBank: "Transfer to Your Bank",
+      transferDeposit: "Transfer to Deposit",
+      dailyOutcomes: "Daily Outcomes (Revolut)",
+      loading: "Loading...",
+      empty: "No data yet — add income and outcome data",
+    },
     chart: {
       title: "Monthly Progress",
       totalAccount: "Total Account",

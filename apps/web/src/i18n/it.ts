@@ -70,6 +70,15 @@ export const it: TranslationKeys = {
 
   dashboard: {
     title: "Dashboard",
+    todo: {
+      title: "Azioni di Questo Mese",
+      transferRevolut: "Trasferisci su Revolut",
+      transferBank: "Trasferisci sul Conto",
+      transferDeposit: "Trasferisci sul Deposito",
+      dailyOutcomes: "Uscite Giornaliere (Revolut)",
+      loading: "Caricamento...",
+      empty: "Nessun dato ancora — aggiungi entrate e uscite",
+    },
     chart: {
       title: "Andamento Mensile",
       totalAccount: "Totale Conto",
