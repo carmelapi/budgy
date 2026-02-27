@@ -18,6 +18,8 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import { api } from "../utils/api";
 import {
@@ -45,6 +47,7 @@ const FixedCostsTable: React.FC = () => {
     description: "",
     amount: "",
     currency: "SEK" as "SEK" | "EUR",
+    payment_source: null as "revolut" | "bank" | null,
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState<boolean>(false);
@@ -101,13 +104,13 @@ const FixedCostsTable: React.FC = () => {
 
   const handleOpenDialog = () => {
     setDialogOpen(true);
-    setFormData({ description: "", amount: "", currency: "SEK" });
+    setFormData({ description: "", amount: "", currency: "SEK", payment_source: null });
     setFormError(null);
   };
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setFormData({ description: "", amount: "", currency: "SEK" });
+    setFormData({ description: "", amount: "", currency: "SEK", payment_source: null });
     setFormError(null);
     setEditingCost(null); // clear edit target so next open defaults to "Add"
   };
@@ -119,6 +122,7 @@ const FixedCostsTable: React.FC = () => {
       description: cost.description,
       amount: cost.amount,
       currency: cost.currency,
+      payment_source: cost.payment_source,
     });
     setFormError(null);
     setDialogOpen(true);
@@ -150,6 +154,7 @@ const FixedCostsTable: React.FC = () => {
         description: description.trim(),
         amount: parseFloat(amount),
         currency,
+        payment_source: formData.payment_source,
       };
 
       if (editingCost) {
@@ -203,6 +208,9 @@ const FixedCostsTable: React.FC = () => {
                 <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
                   {t.outcomes.fixedCosts.table.description}
                 </TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
+                  {t.outcomes.fixedCosts.dialog.paymentSource}
+                </TableCell>
                 <TableCell
                   sx={{ fontWeight: 600, fontSize: "16px" }}
                   align="right"
@@ -215,7 +223,7 @@ const FixedCostsTable: React.FC = () => {
               {fixedCosts.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={2}
+                    colSpan={3}
                     align="center"
                     sx={{ py: 6, color: "#9ca3af" }}
                   >
@@ -243,6 +251,13 @@ const FixedCostsTable: React.FC = () => {
                       <TableCell sx={{ fontSize: "15px" }}>
                         {cost.description}
                       </TableCell>
+                      <TableCell sx={{ fontSize: "15px" }}>
+                        {cost.payment_source === "revolut"
+                          ? t.outcomes.fixedCosts.dialog.revolut
+                          : cost.payment_source === "bank"
+                          ? t.outcomes.fixedCosts.dialog.bank
+                          : "—"}
+                      </TableCell>
                       <TableCell align="right" sx={{ fontSize: "15px" }}>
                         {exchangeRates && user?.base_currency
                           ? formatCurrencyWithConversion(
@@ -258,7 +273,7 @@ const FixedCostsTable: React.FC = () => {
 
                   {/* Grand Total Footer Row */}
                   <TableRow sx={{ backgroundColor: "#e5e7eb" }}>
-                    <TableCell sx={{ fontWeight: 700, fontSize: "16px" }}>
+                    <TableCell colSpan={2} sx={{ fontWeight: 700, fontSize: "16px" }}>
                       {t.outcomes.fixedCosts.grandTotal}
                     </TableCell>
                     <TableCell
@@ -327,6 +342,37 @@ const FixedCostsTable: React.FC = () => {
                 <MenuItem value="EUR">{t.currencies.EUR}</MenuItem>
               </Select>
             </FormControl>
+
+            <div className="flex flex-row gap-6 items-center">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.payment_source === "revolut"}
+                    onChange={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        payment_source: prev.payment_source === "revolut" ? null : "revolut",
+                      }))
+                    }
+                  />
+                }
+                label={t.outcomes.fixedCosts.dialog.revolut}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={formData.payment_source === "bank"}
+                    onChange={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        payment_source: prev.payment_source === "bank" ? null : "bank",
+                      }))
+                    }
+                  />
+                }
+                label={t.outcomes.fixedCosts.dialog.bank}
+              />
+            </div>
 
             {formError && (
               <div className="bg-red-50 border border-red-200 rounded p-3 text-red-700 text-sm">

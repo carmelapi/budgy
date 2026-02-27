@@ -20,6 +20,7 @@ export interface FixedCost {
   description: string;  // e.g., "Hedvig (cat insurance)"
   amount: string;       // Decimal from DB comes as string
   currency: 'SEK' | 'EUR';
+  payment_source: 'revolut' | 'bank' | null;
   created_at: string;
   updated_at: string;
 }

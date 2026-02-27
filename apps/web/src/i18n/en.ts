@@ -78,6 +78,9 @@ export const en = {
         cancel: "Cancel",
         save: "Save",
         saving: "Saving...",
+        paymentSource: "Payment source",
+        revolut: "Revolut",
+        bank: "Your Bank",
       },
     },
 

@@ -45,13 +45,16 @@ export default function Navbar() {
   const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
   // Controls which step of the dialog we're on
-  const [addStep, setAddStep] = useState<"choose" | "income" | "outcome">("choose");
+  const [addStep, setAddStep] = useState<"choose" | "income" | "outcome" | "balance">("choose");
 
   // Income form fields — month defaults to current month
   const [incomeForm, setIncomeForm] = useState({ month: currentMonth, salary: "", extra: "" });
 
   // Outcome form fields — month defaults to current month
   const [outcomeForm, setOutcomeForm] = useState({ month: currentMonth, avgift_loan: "", debt: "", extra: "" });
+
+  // Bank balance form fields
+  const [balanceForm, setBalanceForm] = useState({ month: currentMonth, amount: "" });
 
   const [addError, setAddError] = useState<string | null>(null);
   const [addSubmitting, setAddSubmitting] = useState(false);
@@ -68,6 +71,7 @@ export default function Navbar() {
     setAddStep("choose");
     setIncomeForm({ month: currentMonth, salary: "", extra: "" });
     setOutcomeForm({ month: currentMonth, avgift_loan: "", debt: "", extra: "" });
+    setBalanceForm({ month: currentMonth, amount: "" });
     setAddError(null);
     setAddSubmitting(false);
   };
@@ -91,6 +95,11 @@ export default function Navbar() {
           avgift_loan: Number(outcomeForm.avgift_loan),
           debt: Number(outcomeForm.debt),
           extra: Number(outcomeForm.extra),
+        });
+      } else if (addStep === "balance") {
+        await api.post("/api/account-balances", {
+          month: balanceForm.month,
+          amount: Number(balanceForm.amount),
         });
       }
       handleClose();
@@ -181,6 +190,13 @@ export default function Navbar() {
                   onClick={() => setAddStep("outcome")}
                 >
                   Outcome
+                </Button>
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  onClick={() => setAddStep("balance")}
+                >
+                  Bank Account Balance
                 </Button>
               </div>
             </DialogContent>
@@ -301,6 +317,51 @@ export default function Navbar() {
                 onClick={handleAddSubmit}
                 variant="contained"
                 disabled={addSubmitting || !outcomeForm.month}
+              >
+                {addSubmitting ? "Saving..." : "Save"}
+              </Button>
+            </DialogActions>
+          </>
+        )}
+
+        {/* ── Step 2c: Bank Account Balance form ─────────────────── */}
+        {addStep === "balance" && (
+          <>
+            <DialogTitle>Add Bank Account Balance</DialogTitle>
+            <DialogContent>
+              <div className="flex flex-col gap-4 mt-2">
+                <FormControl fullWidth>
+                  <FormLabel>Month</FormLabel>
+                  <Select
+                    value={balanceForm.month}
+                    onChange={(e) => setBalanceForm({ ...balanceForm, month: e.target.value })}
+                    disabled={addSubmitting}
+                  >
+                    {getMonthOptions().map((m) => (
+                      <MenuItem key={m.value} value={m.value}>{m.label}</MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <TextField
+                  label="Amount on account"
+                  type="number"
+                  fullWidth
+                  value={balanceForm.amount}
+                  onChange={(e) => setBalanceForm({ ...balanceForm, amount: e.target.value })}
+                  disabled={addSubmitting}
+                  inputProps={{ min: 0, step: 0.01 }}
+                />
+
+                {addError && <p className="text-red-500 text-sm">{addError}</p>}
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setAddStep("choose")} disabled={addSubmitting}>Back</Button>
+              <Button
+                onClick={handleAddSubmit}
+                variant="contained"
+                disabled={addSubmitting || !balanceForm.month || !balanceForm.amount}
               >
                 {addSubmitting ? "Saving..." : "Save"}
               </Button>

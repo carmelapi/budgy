@@ -80,6 +80,9 @@ export const it: TranslationKeys = {
         cancel: "Annulla",
         save: "Salva",
         saving: "Salvataggio...",
+        paymentSource: "Fonte di pagamento",
+        revolut: "Revolut",
+        bank: "La tua banca",
       },
     },
 
