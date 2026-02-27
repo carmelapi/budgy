@@ -137,12 +137,12 @@ const FixedCostsTable: React.FC = () => {
     const { description, amount, currency } = formData;
 
     if (!description.trim()) {
-      setFormError("Description is required");
+      setFormError(t.outcomes.fixedCosts.errors.descriptionRequired);
       return;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      setFormError("Amount must be greater than 0");
+      setFormError(t.outcomes.fixedCosts.errors.amountInvalid);
       return;
     }
 
@@ -195,7 +195,7 @@ const FixedCostsTable: React.FC = () => {
       {/* Error state */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <strong>Error:</strong> {error}
+          <strong>{t.errors.errorPrefix}:</strong> {error}
         </div>
       )}
 
@@ -308,7 +308,7 @@ const FixedCostsTable: React.FC = () => {
 
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          {editingCost ? "Edit Fixed Cost" : t.outcomes.fixedCosts.dialog.title}
+          {editingCost ? t.outcomes.fixedCosts.dialog.editTitle : t.outcomes.fixedCosts.dialog.title}
         </DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-4 mt-2">

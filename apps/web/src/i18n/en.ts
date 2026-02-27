@@ -11,15 +11,42 @@ export const en = {
       save: "Save",
       saving: "Saving...",
     },
+    addDialog: {
+      chooseTitle: "What do you want to add?",
+      income: "Income",
+      outcome: "Outcome",
+      bankBalance: "Bank Account Balance",
+      cancel: "Cancel",
+      back: "Back",
+      month: "Month",
+      addIncomeTitle: "Add Income",
+      salary: "Salary",
+      extra: "Extra",
+      addOutcomeTitle: "Add Outcome",
+      loanAvgift: "Loan / Avgift",
+      debt: "Debt",
+      addBankBalanceTitle: "Add Bank Account Balance",
+      amountOnAccount: "Amount on account",
+      somethingWentWrong: "Something went wrong",
+    },
+  },
+
+  sidebar: {
+    dashboard: "Dashboard",
+    incomes: "Incomes",
+    outcomes: "Outcomes",
   },
 
   auth: {
     login: {
       title: "Welcome Back",
       email: "Email",
+      emailPlaceholder: "your@email.com",
       password: "Password",
+      passwordPlaceholder: "••••••••",
       submit: "Login",
-      switchToSignup: "Don't have an account? Sign up",
+      noAccount: "Don't have an account?",
+      signUpLink: "Sign up",
     },
     signup: {
       title: "Create Account",
@@ -28,13 +55,28 @@ export const en = {
       language: "Language",
       currency: "Preferred Currency",
       submit: "Create Account",
-      switchToLogin: "Already have an account? Login",
+      signUp: "Sign Up",
+      hasAccount: "Already have an account?",
+      loginLink: "Login",
     },
     loading: "Please wait...",
+    errors: {
+      bothRequired: "Please enter both email and password",
+      passwordLength: "Password must be at least 6 characters",
+    },
   },
 
   dashboard: {
     title: "Dashboard",
+    table: {
+      title: "Dashboard Summary",
+      month: "Month",
+      totalIncomes: "Total Incomes",
+      finalTotal: "Final Total (Table 3)",
+      totalAccount: "Total Account",
+      empty: "No data yet — add income and outcome data to see the summary",
+      loading: "Loading dashboard...",
+    },
   },
 
   incomes: {
@@ -50,6 +92,20 @@ export const en = {
       subtitle: "Start by adding your first monthly income",
     },
     loading: "Loading incomes...",
+    dialog: {
+      editTitle: "Edit Income",
+      month: "Month",
+      salary: "Salary (kr)",
+      extra: "Extra (kr)",
+      cancel: "Cancel",
+      save: "Save",
+      saving: "Saving...",
+    },
+    errors: {
+      monthRequired: "Month is required",
+      salaryMin: "Salary must be 0 or greater",
+      extraMin: "Extra must be 0 or greater",
+    },
   },
 
   outcomes: {
@@ -70,6 +126,7 @@ export const en = {
       loading: "Loading fixed costs and exchange rates...",
       dialog: {
         title: "Add Fixed Cost",
+        editTitle: "Edit Fixed Cost",
         description: "Description",
         descriptionPlaceholder: "e.g., Netflix, Rent, Insurance",
         amount: "Amount",
@@ -81,6 +138,10 @@ export const en = {
         paymentSource: "Payment source",
         revolut: "Revolut",
         bank: "Your Bank",
+      },
+      errors: {
+        descriptionRequired: "Description is required",
+        amountInvalid: "Amount must be greater than 0",
       },
     },
 
@@ -99,6 +160,22 @@ export const en = {
         subtitle: "Start tracking your monthly expenses",
       },
       loading: "Loading monthly outcomes...",
+      dialog: {
+        editTitle: "Edit Monthly Outcome",
+        month: "Month",
+        avgiftLoan: "Avgift + Loan (kr)",
+        debt: "Debt (kr)",
+        extra: "Extra (kr)",
+        cancel: "Cancel",
+        save: "Save",
+        saving: "Saving...",
+      },
+      errors: {
+        monthRequired: "Month is required",
+        avgiftLoanMin: "Avgift + Loan must be 0 or greater",
+        debtMin: "Debt must be 0 or greater",
+        extraMin: "Extra must be 0 or greater",
+      },
     },
 
     budgetAnalysis: {
@@ -135,6 +212,7 @@ export const en = {
     invalidPassword: "Password must be at least 6 characters",
     loginFailed: "Login failed",
     signupFailed: "Signup failed",
+    errorPrefix: "Error",
   },
 };
 

@@ -11,10 +11,12 @@ import {
 } from '@mui/material';
 import { api } from '../utils/api';
 import { useBudget } from '../context/BudgetContext';
+import { useTranslation } from '../hooks/useTranslation';
 import type { MonthlyOutcome } from '../types/incomes-outcomes.types';
 
 const BudgetAnalysisTable: React.FC = () => {
   const { getIncomeForMonth, fixedCostsTotal } = useBudget();
+  const { t } = useTranslation();
 
   const [outcomes, setOutcomes] = useState<MonthlyOutcome[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -63,41 +65,38 @@ const BudgetAnalysisTable: React.FC = () => {
 
   return (
     <div className="mb-6">
-      <h2 className="text-xl font-semibold mb-3 text-gray-800">Table 3: Budget Analysis</h2>
+      <h2 className="text-xl font-semibold mb-3 text-gray-800">{t.outcomes.budgetAnalysis.title}</h2>
 
-      {/* Loading state */}
       {loading && (
         <div className="flex justify-center items-center py-8 bg-yellow-50 rounded-lg">
           <CircularProgress size={24} />
-          <span className="ml-3 text-gray-600">Loading budget analysis...</span>
+          <span className="ml-3 text-gray-600">{t.outcomes.budgetAnalysis.loading}</span>
         </div>
       )}
 
-      {/* Error state */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
-          <strong>Error:</strong> {error}
+          <strong>{t.errors.errorPrefix}:</strong> {error}
         </div>
       )}
 
-      {/* Table */}
       {!loading && !error && (
         <TableContainer component={Paper} className="shadow-md">
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: '#fef9c3' }}>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>Month</TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>{t.outcomes.budgetAnalysis.table.month}</TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                  Outcomes %
+                  {t.outcomes.budgetAnalysis.table.outcomesPercent}
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                  Remaining %
+                  {t.outcomes.budgetAnalysis.table.remainingPercent}
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                  Remaining (kr)
+                  {t.outcomes.budgetAnalysis.table.remainingKr}
                 </TableCell>
                 <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
-                  Final Total
+                  {t.outcomes.budgetAnalysis.table.finalTotal}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -106,8 +105,8 @@ const BudgetAnalysisTable: React.FC = () => {
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 6, color: '#9ca3af' }}>
                     <div className="flex flex-col items-center gap-2">
-                      <span className="text-lg">No budget analysis data yet</span>
-                      <span className="text-sm">Add income and outcome data to see analysis</span>
+                      <span className="text-lg">{t.outcomes.budgetAnalysis.empty.title}</span>
+                      <span className="text-sm">{t.outcomes.budgetAnalysis.empty.subtitle}</span>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -121,7 +120,7 @@ const BudgetAnalysisTable: React.FC = () => {
                       <TableRow key={outcome.id}>
                         <TableCell sx={{ fontSize: '15px' }}>{formatMonth(month)}</TableCell>
                         <TableCell colSpan={4} align="center" sx={{ color: '#9ca3af' }}>
-                          No income data for this month
+                          {t.outcomes.budgetAnalysis.noIncomeForMonth}
                         </TableCell>
                       </TableRow>
                     );
@@ -153,7 +152,6 @@ const BudgetAnalysisTable: React.FC = () => {
                         align="right"
                         sx={{
                           fontSize: '15px',
-                          // Red if negative, green if positive
                           color: remainingPercent < 0 ? '#dc2626' : '#059669',
                         }}
                       >
