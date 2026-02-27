@@ -76,6 +76,8 @@ export const en = {
       totalAccount: "Total Account",
       empty: "No data yet — add income and outcome data to see the summary",
       loading: "Loading dashboard...",
+      editBalanceTitle: "Edit Bank Balance",
+      balanceAmount: "Amount (kr)",
     },
   },
 
