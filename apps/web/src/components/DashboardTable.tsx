@@ -1,3 +1,6 @@
+import AmountField from "../components/AmountField";
+import { amountForSave, evaluateAmount } from "../utils/amount";
+import { useBudget } from "../context/BudgetContext";
 import { useState, useEffect, useCallback } from 'react';
 import {
   Table,
@@ -13,7 +16,6 @@ import {
   DialogContent,
   DialogActions,
   Button,
-  TextField,
 } from '@mui/material';
 import { api } from '../utils/api';
 import { useTranslation } from '../hooks/useTranslation';
@@ -71,6 +73,7 @@ const getPreviousMonth = (month: string): string => {
 
 export default function DashboardTable() {
   const { t } = useTranslation();
+  const { budgetVersion, refreshBudget } = useBudget();
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<DashboardRow[]>([]);
   const [balanceMap, setBalanceMap] = useState<Map<string, number>>(new Map());
@@ -84,8 +87,6 @@ export default function DashboardTable() {
 
   const fetchAll = useCallback(async () => {
     try {
-      setLoading(true);
-
       const [incomesRes, outcomesRes, fixedCostsRes, balancesRes] = await Promise.all([
         api.get('/api/incomes'),
         api.get('/api/monthly-outcomes'),
@@ -154,7 +155,7 @@ export default function DashboardTable() {
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+  }, [fetchAll, budgetVersion]);
 
   const handleRowClick = (row: DashboardRow) => {
     const prevMonth = getPreviousMonth(row.month);
@@ -171,16 +172,16 @@ export default function DashboardTable() {
   };
 
   const handleDialogSave = async () => {
-    if (!dialogAmount || isNaN(Number(dialogAmount))) return;
+    if (!dialogAmount || !(evaluateAmount(dialogAmount) >= 0)) return;
     try {
       setDialogSubmitting(true);
       setDialogError(null);
       await api.post('/api/account-balances', {
         month: dialogPrevMonth,
-        amount: Number(dialogAmount),
+        amount: amountForSave(dialogAmount, t.amount.invalid),
       });
       setDialogOpen(false);
-      await fetchAll();
+      refreshBudget();
     } catch (err: any) {
       setDialogError(err.message || t.navbar.addDialog.somethingWentWrong);
     } finally {
@@ -200,18 +201,18 @@ export default function DashboardTable() {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-3 text-gray-800">{t.dashboard.table.title}</h2>
-      <TableContainer component={Paper} className="shadow-md">
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#f0fdf4' }}>
-              <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>{t.dashboard.table.month}</TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+            <TableRow>
+              <TableCell sx={{ fontWeight: 600, fontSize: "13px" }}>{t.dashboard.table.month}</TableCell>
+              <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                 {t.dashboard.table.totalIncomes}
               </TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+              <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                 {t.dashboard.table.finalTotal}
               </TableCell>
-              <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+              <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                 {t.dashboard.table.totalAccount}
               </TableCell>
             </TableRow>
@@ -230,7 +231,7 @@ export default function DashboardTable() {
                   onClick={() => handleRowClick(row)}
                   sx={{
                     cursor: 'pointer',
-                    '&:hover': { backgroundColor: '#f0fdf4' },
+                    '&:hover': { backgroundColor: '#f5f7fc' },
                     transition: 'background-color 0.2s',
                   }}
                 >
@@ -258,9 +259,8 @@ export default function DashboardTable() {
         </DialogTitle>
         <DialogContent>
           <div className="flex flex-col gap-4 mt-2">
-            <TextField
+            <AmountField
               label={t.dashboard.table.balanceAmount}
-              type="number"
               fullWidth
               value={dialogAmount}
               onChange={(e) => setDialogAmount(e.target.value)}

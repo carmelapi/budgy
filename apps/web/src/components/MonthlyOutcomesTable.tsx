@@ -1,3 +1,5 @@
+import AmountField from "../components/AmountField";
+import { amountForSave, evaluateAmount } from "../utils/amount";
 import React, { useState, useEffect } from 'react';
 import {
   Table,
@@ -13,7 +15,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -37,7 +38,7 @@ function getMonthOptions() {
 }
 
 const MonthlyOutcomesTable: React.FC = () => {
-  const { fixedCostsTotal } = useBudget();
+  const { fixedCostsTotal, budgetVersion, refreshBudget } = useBudget();
   const { t } = useTranslation();
 
   const [outcomes, setOutcomes] = useState<MonthlyOutcome[]>([]);
@@ -51,7 +52,6 @@ const MonthlyOutcomesTable: React.FC = () => {
 
   const fetchOutcomes = async () => {
     try {
-      setLoading(true);
       setError(null);
       const response = await api.get('/api/monthly-outcomes');
       setOutcomes(response.monthlyOutcomes);
@@ -65,7 +65,7 @@ const MonthlyOutcomesTable: React.FC = () => {
 
   useEffect(() => {
     fetchOutcomes();
-  }, []);
+  }, [budgetVersion]);
 
   const calculateRowTotal = (outcome: MonthlyOutcome): number => {
     const avgiftLoan = parseFloat(outcome.avgift_loan);
@@ -108,15 +108,15 @@ const MonthlyOutcomesTable: React.FC = () => {
       setEditError(t.outcomes.monthlyOutcomes.errors.monthRequired);
       return;
     }
-    if (editForm.avgift_loan === '' || parseFloat(editForm.avgift_loan) < 0) {
+    if (editForm.avgift_loan === '' || !(evaluateAmount(editForm.avgift_loan) >= 0)) {
       setEditError(t.outcomes.monthlyOutcomes.errors.avgiftLoanMin);
       return;
     }
-    if (editForm.debt === '' || parseFloat(editForm.debt) < 0) {
+    if (editForm.debt === '' || !(evaluateAmount(editForm.debt) >= 0)) {
       setEditError(t.outcomes.monthlyOutcomes.errors.debtMin);
       return;
     }
-    if (editForm.extra === '' || parseFloat(editForm.extra) < 0) {
+    if (editForm.extra === '' || !(evaluateAmount(editForm.extra) >= 0)) {
       setEditError(t.outcomes.monthlyOutcomes.errors.extraMin);
       return;
     }
@@ -127,14 +127,12 @@ const MonthlyOutcomesTable: React.FC = () => {
 
       await api.put(`/api/monthly-outcomes/${editingOutcome.id}`, {
         month: editForm.month,
-        avgift_loan: parseFloat(editForm.avgift_loan),
-        debt: parseFloat(editForm.debt),
-        extra: parseFloat(editForm.extra),
+        avgift_loan: amountForSave(editForm.avgift_loan, t.amount.invalid),
+        debt: amountForSave(editForm.debt, t.amount.invalid),
+        extra: amountForSave(editForm.extra, t.amount.invalid),
       });
 
-      const response = await api.get('/api/monthly-outcomes');
-      setOutcomes(response.monthlyOutcomes);
-
+      refreshBudget();
       handleCloseEdit();
     } catch (err) {
       console.error('Error updating monthly outcome:', err);
@@ -162,24 +160,24 @@ const MonthlyOutcomesTable: React.FC = () => {
       )}
 
       {!loading && !error && (
-        <TableContainer component={Paper} className="shadow-md">
+        <TableContainer component={Paper}>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#fee2e2' }}>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>{t.outcomes.monthlyOutcomes.table.month}</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }}>{t.outcomes.monthlyOutcomes.table.month}</TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.monthlyOutcomes.table.avgiftLoan}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.monthlyOutcomes.table.fixedCostsTotal}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.monthlyOutcomes.table.debt}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.monthlyOutcomes.table.extra}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.monthlyOutcomes.table.total}
                 </TableCell>
               </TableRow>
@@ -204,7 +202,7 @@ const MonthlyOutcomesTable: React.FC = () => {
                       onClick={() => handleRowClick(outcome)}
                       sx={{
                         cursor: 'pointer',
-                        '&:hover': { backgroundColor: '#fef2f2' },
+                        '&:hover': { backgroundColor: '#f5f7fc' },
                         transition: 'background-color 0.2s',
                       }}
                     >
@@ -262,9 +260,8 @@ const MonthlyOutcomesTable: React.FC = () => {
               </Select>
             </FormControl>
 
-            <TextField
+            <AmountField
               label={t.outcomes.monthlyOutcomes.dialog.avgiftLoan}
-              type="number"
               value={editForm.avgift_loan}
               onChange={(e) =>
                 setEditForm((prev) => ({ ...prev, avgift_loan: e.target.value }))
@@ -273,9 +270,8 @@ const MonthlyOutcomesTable: React.FC = () => {
               inputProps={{ min: 0, step: 0.01 }}
             />
 
-            <TextField
+            <AmountField
               label={t.outcomes.monthlyOutcomes.dialog.debt}
-              type="number"
               value={editForm.debt}
               onChange={(e) =>
                 setEditForm((prev) => ({ ...prev, debt: e.target.value }))
@@ -284,9 +280,8 @@ const MonthlyOutcomesTable: React.FC = () => {
               inputProps={{ min: 0, step: 0.01 }}
             />
 
-            <TextField
+            <AmountField
               label={t.outcomes.monthlyOutcomes.dialog.extra}
-              type="number"
               value={editForm.extra}
               onChange={(e) =>
                 setEditForm((prev) => ({ ...prev, extra: e.target.value }))

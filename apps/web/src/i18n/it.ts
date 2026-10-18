@@ -1,6 +1,7 @@
 import type { TranslationKeys } from "./en";
 
 export const it: TranslationKeys = {
+  amount: { hint: "Importo o calcolo, es. 535*3", invalid: "Inserisci un importo o un calcolo valido, maggiore o uguale a zero." },
   navbar: {
     welcome: "Benvenuto",
     add: "Aggiungi",
@@ -91,6 +92,7 @@ export const it: TranslationKeys = {
   },
 
   incomes: {
+    partialSaveHint: "Compila solo gli importi da impostare per il mese: quelli vuoti restano invariati. Gli importi inseriti sostituiscono quelli precedenti.",
     title: "Entrate Mensili",
     table: {
       month: "Mese",

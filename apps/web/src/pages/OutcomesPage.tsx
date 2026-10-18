@@ -6,7 +6,7 @@ import { useBudget } from "../context/BudgetContext";
 import { api } from "../utils/api";
 
 const OutcomesPage: React.FC = () => {
-  const { setIncomes } = useBudget();
+  const { setIncomes, budgetVersion } = useBudget();
 
   useEffect(() => {
     const fetchIncomes = async () => {
@@ -19,10 +19,10 @@ const OutcomesPage: React.FC = () => {
     };
 
     fetchIncomes();
-  }, [setIncomes]);
+  }, [setIncomes, budgetVersion]);
 
   return (
-    <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
+    <div className="page-content">
       <h1 className="text-2xl font-bold text-gray-800">Outcomes</h1>
 
       {/* Table 1: Fixed Costs (Grey background) */}

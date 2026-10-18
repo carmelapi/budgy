@@ -3,10 +3,10 @@ import * as incomesService from './incomes.service.js';
 const validateIncomeData = (data) => {
   const errors = [];
 
-  if (data.salary !== undefined && (isNaN(data.salary) || data.salary < 0)) {
+  if (data.salary !== undefined && (typeof data.salary !== 'number' || !Number.isFinite(data.salary) || data.salary < 0)) {
     errors.push('Salary must be a non-negative number');
   }
-  if (data.extra !== undefined && (isNaN(data.extra) || data.extra < 0)) {
+  if (data.extra !== undefined && (typeof data.extra !== 'number' || !Number.isFinite(data.extra) || data.extra < 0)) {
     errors.push('Extra income must be a non-negative number');
   }
   if (data.month !== undefined && !/^\d{4}-\d{2}$/.test(data.month)) {
@@ -41,15 +41,15 @@ export const createIncome = async (req, res) => {
   try {
     const { month, salary, extra } = req.body;
 
-    if (!month || salary === undefined || extra === undefined) {
-      return res.status(400).json({ message: 'Month, salary, and extra are required' });
+    if (!month || (salary === undefined && extra === undefined)) {
+      return res.status(400).json({ message: 'Month and at least one of salary or extra are required' });
     }
 
     const errors = validateIncomeData(req.body);
     if (errors.length > 0) return res.status(400).json({ message: 'Validation failed', errors });
 
     const income = await incomesService.create(req.user.userId, { month, salary, extra });
-    res.status(201).json({ income });
+    res.json({ income });
   } catch (error) {
     if (error.code === '23505') {
       return res.status(409).json({ message: 'Income for this month already exists' });

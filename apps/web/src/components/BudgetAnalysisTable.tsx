@@ -15,7 +15,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import type { MonthlyOutcome } from '../types/incomes-outcomes.types';
 
 const BudgetAnalysisTable: React.FC = () => {
-  const { getIncomeForMonth, fixedCostsTotal } = useBudget();
+  const { getIncomeForMonth, fixedCostsTotal, budgetVersion } = useBudget();
   const { t } = useTranslation();
 
   const [outcomes, setOutcomes] = useState<MonthlyOutcome[]>([]);
@@ -25,7 +25,6 @@ const BudgetAnalysisTable: React.FC = () => {
   useEffect(() => {
     const fetchOutcomes = async () => {
       try {
-        setLoading(true);
         setError(null);
 
         const response = await api.get('/api/monthly-outcomes');
@@ -39,7 +38,7 @@ const BudgetAnalysisTable: React.FC = () => {
     };
 
     fetchOutcomes();
-  }, []);
+  }, [budgetVersion]);
 
   const calculateMonthlyOutcomeTotal = (outcome: MonthlyOutcome): number => {
     const avgiftLoan = parseFloat(outcome.avgift_loan);
@@ -81,21 +80,21 @@ const BudgetAnalysisTable: React.FC = () => {
       )}
 
       {!loading && !error && (
-        <TableContainer component={Paper} className="shadow-md">
+        <TableContainer component={Paper}>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: '#fef9c3' }}>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }}>{t.outcomes.budgetAnalysis.table.month}</TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }}>{t.outcomes.budgetAnalysis.table.month}</TableCell>
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.budgetAnalysis.table.outcomesPercent}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.budgetAnalysis.table.remainingPercent}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.budgetAnalysis.table.remainingKr}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: '16px' }} align="right">
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }} align="right">
                   {t.outcomes.budgetAnalysis.table.finalTotal}
                 </TableCell>
               </TableRow>
@@ -140,7 +139,7 @@ const BudgetAnalysisTable: React.FC = () => {
                     <TableRow
                       key={outcome.id}
                       sx={{
-                        '&:hover': { backgroundColor: '#fefce8' },
+                        '&:hover': { backgroundColor: '#f5f7fc' },
                         transition: 'background-color 0.2s',
                       }}
                     >

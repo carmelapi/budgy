@@ -1,3 +1,6 @@
+import AmountField from "../components/AmountField";
+import { amountForSave, evaluateAmount } from "../utils/amount";
+import { useBudget } from "../context/BudgetContext";
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -13,7 +16,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField,
   FormControl,
   InputLabel,
   Select,
@@ -40,6 +42,7 @@ function getMonthOptions() {
 
 const IncomesPage: React.FC = () => {
   const { t } = useTranslation();
+  const { budgetVersion } = useBudget();
 
   const [incomes, setIncomes] = useState<MonthlyIncome[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -58,7 +61,6 @@ const IncomesPage: React.FC = () => {
 
   const fetchIncomes = async () => {
     try {
-      setLoading(true);
       setError(null);
       const response = await api.get("/api/incomes");
       setIncomes(response.incomes);
@@ -72,7 +74,7 @@ const IncomesPage: React.FC = () => {
 
   useEffect(() => {
     fetchIncomes();
-  }, []);
+  }, [budgetVersion]);
 
   const formatCurrency = (amount: string): string => {
     const num = parseFloat(amount);
@@ -111,11 +113,11 @@ const IncomesPage: React.FC = () => {
       setEditError(t.incomes.errors.monthRequired);
       return;
     }
-    if (editForm.salary === "" || parseFloat(editForm.salary) < 0) {
+    if (editForm.salary === "" || !(evaluateAmount(editForm.salary) >= 0)) {
       setEditError(t.incomes.errors.salaryMin);
       return;
     }
-    if (editForm.extra === "" || parseFloat(editForm.extra) < 0) {
+    if (editForm.extra === "" || !(evaluateAmount(editForm.extra) >= 0)) {
       setEditError(t.incomes.errors.extraMin);
       return;
     }
@@ -126,8 +128,8 @@ const IncomesPage: React.FC = () => {
 
       await api.put(`/api/incomes/${editingIncome.id}`, {
         month: editForm.month,
-        salary: parseFloat(editForm.salary),
-        extra: parseFloat(editForm.extra),
+        salary: amountForSave(editForm.salary, t.amount.invalid),
+        extra: amountForSave(editForm.extra, t.amount.invalid),
       });
 
       const response = await api.get("/api/incomes");
@@ -146,7 +148,7 @@ const IncomesPage: React.FC = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-4 p-6 w-full overflow-auto">
+      <div className="page-content">
         <h1 className="text-2xl font-bold text-gray-800">{t.incomes.title}</h1>
 
         {loading && (
@@ -163,27 +165,27 @@ const IncomesPage: React.FC = () => {
         )}
 
         {!loading && !error && (
-          <TableContainer component={Paper} className="shadow-md">
+          <TableContainer component={Paper}>
             <Table>
               <TableHead>
-                <TableRow sx={{ backgroundColor: "#beffd2" }}>
-                  <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600, fontSize: "13px" }}>
                     {t.incomes.table.month}
                   </TableCell>
                   <TableCell
-                    sx={{ fontWeight: 600, fontSize: "16px" }}
+                    sx={{ fontWeight: 600, fontSize: "13px" }}
                     align="right"
                   >
                     {t.incomes.table.salary}
                   </TableCell>
                   <TableCell
-                    sx={{ fontWeight: 600, fontSize: "16px" }}
+                    sx={{ fontWeight: 600, fontSize: "13px" }}
                     align="right"
                   >
                     {t.incomes.table.extra}
                   </TableCell>
                   <TableCell
-                    sx={{ fontWeight: 600, fontSize: "16px" }}
+                    sx={{ fontWeight: 600, fontSize: "13px" }}
                     align="right"
                   >
                     {t.incomes.table.total}
@@ -213,7 +215,7 @@ const IncomesPage: React.FC = () => {
                       onClick={() => handleRowClick(income)}
                       sx={{
                         cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f9fafb" },
+                        "&:hover": { backgroundColor: "#f5f7fc" },
                         transition: "background-color 0.2s",
                       }}
                     >
@@ -271,9 +273,8 @@ const IncomesPage: React.FC = () => {
               </Select>
             </FormControl>
 
-            <TextField
+            <AmountField
               label={t.incomes.dialog.salary}
-              type="number"
               value={editForm.salary}
               onChange={(e) =>
                 setEditForm((prev) => ({ ...prev, salary: e.target.value }))
@@ -282,9 +283,8 @@ const IncomesPage: React.FC = () => {
               inputProps={{ min: 0, step: 0.01 }}
             />
 
-            <TextField
+            <AmountField
               label={t.incomes.dialog.extra}
-              type="number"
               value={editForm.extra}
               onChange={(e) =>
                 setEditForm((prev) => ({ ...prev, extra: e.target.value }))

@@ -1,3 +1,5 @@
+import AmountField from "../components/AmountField";
+import { amountForSave, evaluateAmount } from "../utils/amount";
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -141,7 +143,7 @@ const FixedCostsTable: React.FC = () => {
       return;
     }
 
-    if (!amount || parseFloat(amount) <= 0) {
+    if (!amount || !(evaluateAmount(amount) > 0)) {
       setFormError(t.outcomes.fixedCosts.errors.amountInvalid);
       return;
     }
@@ -152,7 +154,7 @@ const FixedCostsTable: React.FC = () => {
 
       const payload = {
         description: description.trim(),
-        amount: parseFloat(amount),
+        amount: amountForSave(amount, t.amount.invalid),
         currency,
         payment_source: formData.payment_source,
       };
@@ -201,18 +203,18 @@ const FixedCostsTable: React.FC = () => {
 
       {/* Table */}
       {!loading && !error && (
-        <TableContainer component={Paper} className="shadow-md">
+        <TableContainer component={Paper}>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: "#f3f4f6" }}>
-                <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
+              <TableRow>
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }}>
                   {t.outcomes.fixedCosts.table.description}
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, fontSize: "16px" }}>
+                <TableCell sx={{ fontWeight: 600, fontSize: "13px" }}>
                   {t.outcomes.fixedCosts.dialog.paymentSource}
                 </TableCell>
                 <TableCell
-                  sx={{ fontWeight: 600, fontSize: "16px" }}
+                  sx={{ fontWeight: 600, fontSize: "13px" }}
                   align="right"
                 >
                   {t.outcomes.fixedCosts.table.amount}
@@ -244,7 +246,7 @@ const FixedCostsTable: React.FC = () => {
                       onClick={() => handleRowClick(cost)}
                       sx={{
                         cursor: "pointer",
-                        "&:hover": { backgroundColor: "#f9fafb" },
+                        "&:hover": { backgroundColor: "#f5f7fc" },
                         transition: "background-color 0.2s",
                       }}
                     >
@@ -272,15 +274,15 @@ const FixedCostsTable: React.FC = () => {
                   ))}
 
                   {/* Grand Total Footer Row */}
-                  <TableRow sx={{ backgroundColor: "#e5e7eb" }}>
-                    <TableCell colSpan={2} sx={{ fontWeight: 700, fontSize: "16px" }}>
+                  <TableRow sx={{ backgroundColor: "#fafafc" }}>
+                    <TableCell colSpan={2} sx={{ fontWeight: 700, fontSize: "13px" }}>
                       {t.outcomes.fixedCosts.grandTotal}
                     </TableCell>
                     <TableCell
                       align="right"
                       sx={{
                         fontWeight: 700,
-                        fontSize: "16px",
+                        fontSize: "13px",
                         color: "#1f2937",
                       }}
                     >
@@ -321,9 +323,8 @@ const FixedCostsTable: React.FC = () => {
               autoFocus
             />
 
-            <TextField
+            <AmountField
               label={t.outcomes.fixedCosts.dialog.amount}
-              type="number"
               placeholder={t.outcomes.fixedCosts.dialog.amountPlaceholder}
               value={formData.amount}
               onChange={(e) => handleFormChange("amount", e.target.value)}

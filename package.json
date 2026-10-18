@@ -10,7 +10,8 @@
     "dev:web": "npm run dev --workspace=apps/web",
     "dev:api": "npm run start --workspace=apps/api",
     "build:web": "npm run build --workspace=apps/web",
-    "lint:web": "npm run lint --workspace=apps/web"
+    "lint:web": "npm run lint --workspace=apps/web",
+    "test:amount": "node --experimental-strip-types --test apps/web/tests/amount.test.mjs"
   },
   "engines": {
     "node": ">=20.0.0",

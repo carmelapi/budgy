@@ -1,4 +1,5 @@
 export const en = {
+  amount: { hint: "Amount or calculation, e.g. 535*3", invalid: "Enter a valid amount or calculation, greater than or equal to zero." },
   navbar: {
     welcome: "Welcome",
     add: "Add",
@@ -88,6 +89,7 @@ export const en = {
   },
 
   incomes: {
+    partialSaveHint: "Enter only the amounts to set for this month: blank fields stay unchanged. Entered amounts replace previous values.",
     title: "Monthly Incomes",
     table: {
       month: "Month",

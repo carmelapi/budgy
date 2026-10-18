@@ -1,3 +1,5 @@
+import { ThemeProvider } from "@mui/material/styles"
+import { theme } from "./theme"
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
@@ -7,10 +9,12 @@ import { AuthProvider } from './context/AuthContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </AuthProvider>
+    <ThemeProvider theme={theme}>
+      <AuthProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   </StrictMode>,
 )

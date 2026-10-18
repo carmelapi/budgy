@@ -72,8 +72,8 @@ export default function LoginPage() {
   const displayError = error || localError;
 
   return (
-    <div className="flex flex-col w-full h-screen justify-center items-center bg-gray-50">
-      <div className="flex flex-col justify-center items-center gap-6 bg-white rounded-lg shadow-md w-96 p-8">
+    <div className="login-page">
+      <div className="login-card">
         <h1 className="text-2xl font-bold text-gray-800">
           {mode === "login" ? t.auth.login.title : t.auth.signup.title}
         </h1>

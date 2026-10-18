@@ -4,14 +4,14 @@ import Sidebar from "./Sidebar";
 
 export default function AppLayout() {
   return (
-    <>
+    <div className="app-shell">
       <Navbar />
-      <div className="flex flex-row w-full h-[calc(100vh-60px)]">
+      <div className="app-body">
         <Sidebar />
-        <main className="flex-1 overflow-auto">
+        <main className="app-main">
           <Outlet />
         </main>
       </div>
-    </>
+    </div>
   );
 }

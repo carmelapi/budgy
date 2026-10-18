@@ -29,3 +29,9 @@ npm-debug.log*
 
 # Testing
 coverage
+# Local database
+.local/
+
+# Committable environment templates
+!.env.example
+!**/.env.example

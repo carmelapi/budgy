@@ -1,3 +1,5 @@
+import AmountField from "../components/AmountField";
+import { amountForSave } from "../utils/amount";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/img/Logo.svg";
@@ -11,9 +13,9 @@ import {
   FormLabel,
   Select,
   MenuItem,
-  TextField,
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
+import { useBudget } from "../context/BudgetContext";
 import { api } from "../utils/api";
 import { useTranslation } from "../hooks/useTranslation";
 
@@ -43,6 +45,7 @@ export default function Navbar() {
   const { user, logout, updateSettings } = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { refreshBudget } = useBudget();
 
   // ── Add dialog state ──────────────────────────────────────────────────────
   // Pre-compute current month in "2026-02" format so forms default to it
@@ -106,29 +109,29 @@ export default function Navbar() {
     setAddSubmitting(true);
     try {
       if (addStep === "income") {
-        // POST to /api/incomes — backend expects { month, salary, extra }
+        // Omit blank fields so adding extra preserves the existing salary.
         await api.post("/api/incomes", {
           month: incomeForm.month,
-          salary: Number(incomeForm.salary),
-          extra: Number(incomeForm.extra),
+          salary: incomeForm.salary.trim() ? amountForSave(incomeForm.salary, t.amount.invalid) : undefined,
+          extra: incomeForm.extra.trim() ? amountForSave(incomeForm.extra, t.amount.invalid) : undefined,
         });
       } else if (addStep === "outcome") {
         // POST to /api/monthly-outcomes — backend expects { month, avgift_loan, debt, extra }
         await api.post("/api/monthly-outcomes", {
           month: outcomeForm.month,
-          avgift_loan: Number(outcomeForm.avgift_loan),
-          debt: Number(outcomeForm.debt),
-          extra: Number(outcomeForm.extra),
+          avgift_loan: amountForSave(outcomeForm.avgift_loan, t.amount.invalid, true),
+          debt: amountForSave(outcomeForm.debt, t.amount.invalid, true),
+          extra: amountForSave(outcomeForm.extra, t.amount.invalid, true),
         });
       } else if (addStep === "balance") {
         await api.post("/api/account-balances", {
           month: balanceForm.month,
-          amount: Number(balanceForm.amount),
+          amount: amountForSave(balanceForm.amount, t.amount.invalid, true),
         });
       }
       handleClose();
-      // Refresh the current page so the new row appears in the table
-      navigate(0);
+      // Update mounted tables and charts without reloading the page.
+      refreshBudget();
     } catch (err: any) {
       setAddError(err.message || t.navbar.addDialog.somethingWentWrong);
     } finally {
@@ -168,14 +171,14 @@ export default function Navbar() {
   };
 
   return (
-    <div className="bg-white flex flex-row w-full justify-between py-4 px-6 items-center">
-      <img src={logo} alt="Budgy brand" height="36px" />
+    <div className="app-navbar">
+      <img className="app-logo" src={logo} alt="Budgy brand" height="32" />
 
-      <div className="flex flex-row gap-4 items-center">
+      <div className="navbar-actions">
         {user && (
           <button
             onClick={handleOpenSettings}
-            className="text-sm text-gray-600 hover:text-blue-600 transition-colors cursor-pointer"
+            className="account-button"
           >
             {t.navbar.welcome},{" "}
             <span className="font-medium">{user.email}</span>
@@ -235,6 +238,7 @@ export default function Navbar() {
           <>
             <DialogTitle>{t.navbar.addDialog.addIncomeTitle}</DialogTitle>
             <DialogContent>
+              <p className="text-sm text-gray-500 mb-4">{t.incomes.partialSaveHint}</p>
               <div className="flex flex-col gap-4 mt-2">
                 {/* Month picker */}
                 <FormControl fullWidth>
@@ -254,10 +258,9 @@ export default function Navbar() {
                   </Select>
                 </FormControl>
 
-                <TextField
+                <AmountField
                   label={t.navbar.addDialog.salary}
-                  type="number"
-                  fullWidth
+                      fullWidth
                   value={incomeForm.salary}
                   onChange={(e) =>
                     setIncomeForm({ ...incomeForm, salary: e.target.value })
@@ -265,10 +268,9 @@ export default function Navbar() {
                   disabled={addSubmitting}
                 />
 
-                <TextField
+                <AmountField
                   label={t.navbar.addDialog.extra}
-                  type="number"
-                  fullWidth
+                      fullWidth
                   value={incomeForm.extra}
                   onChange={(e) =>
                     setIncomeForm({ ...incomeForm, extra: e.target.value })
@@ -285,7 +287,7 @@ export default function Navbar() {
               <Button
                 onClick={handleAddSubmit}
                 variant="contained"
-                disabled={addSubmitting || !incomeForm.month}
+                disabled={addSubmitting || !incomeForm.month || (!incomeForm.salary.trim() && !incomeForm.extra.trim())}
               >
                 {addSubmitting ? t.navbar.settings.saving : t.navbar.settings.save}
               </Button>
@@ -317,10 +319,9 @@ export default function Navbar() {
                   </Select>
                 </FormControl>
 
-                <TextField
+                <AmountField
                   label={t.navbar.addDialog.loanAvgift}
-                  type="number"
-                  fullWidth
+                      fullWidth
                   value={outcomeForm.avgift_loan}
                   onChange={(e) =>
                     setOutcomeForm({
@@ -331,10 +332,9 @@ export default function Navbar() {
                   disabled={addSubmitting}
                 />
 
-                <TextField
+                <AmountField
                   label={t.navbar.addDialog.debt}
-                  type="number"
-                  fullWidth
+                      fullWidth
                   value={outcomeForm.debt}
                   onChange={(e) =>
                     setOutcomeForm({ ...outcomeForm, debt: e.target.value })
@@ -342,10 +342,9 @@ export default function Navbar() {
                   disabled={addSubmitting}
                 />
 
-                <TextField
+                <AmountField
                   label={t.navbar.addDialog.extra}
-                  type="number"
-                  fullWidth
+                      fullWidth
                   value={outcomeForm.extra}
                   onChange={(e) =>
                     setOutcomeForm({ ...outcomeForm, extra: e.target.value })
@@ -392,10 +391,9 @@ export default function Navbar() {
                   </Select>
                 </FormControl>
 
-                <TextField
+                <AmountField
                   label={t.navbar.addDialog.amountOnAccount}
-                  type="number"
-                  fullWidth
+                      fullWidth
                   value={balanceForm.amount}
                   onChange={(e) =>
                     setBalanceForm({ ...balanceForm, amount: e.target.value })

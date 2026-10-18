@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback } from "react";
 import type { ReactNode } from "react";
 import type { MonthlyIncome } from "../types/incomes-outcomes.types";
 
 interface BudgetContextType {
+  budgetVersion: number;
+  refreshBudget: () => void;
   incomes: MonthlyIncome[];
   setIncomes: (incomes: MonthlyIncome[]) => void;
   getIncomeForMonth: (month: string) => MonthlyIncome | undefined;
@@ -15,6 +17,11 @@ const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 export const BudgetProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const [budgetVersion, setBudgetVersion] = useState(0);
+  const refreshBudget = useCallback(() => {
+    setBudgetVersion((version) => version + 1);
+  }, []);
+
   const [incomes, setIncomes] = useState<MonthlyIncome[]>([]);
   const [fixedCostsTotal, setFixedCostsTotal] = useState<number>(0);
 
@@ -23,6 +30,8 @@ export const BudgetProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const value: BudgetContextType = {
+    budgetVersion,
+    refreshBudget,
     incomes,
     setIncomes,
     getIncomeForMonth,

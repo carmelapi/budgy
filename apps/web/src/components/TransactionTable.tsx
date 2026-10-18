@@ -81,7 +81,7 @@ const TransactionTable: React.FC = () => {
           borderColor: 'divider',
           '& .MuiTab-root': {
             textTransform: 'none',
-            fontSize: '16px',
+            fontSize: "13px",
             fontWeight: 500,
           },
         }}
@@ -95,7 +95,7 @@ const TransactionTable: React.FC = () => {
       <TableContainer component={Paper} elevation={0}>
         <Table>
           <TableHead>
-            <TableRow sx={{ backgroundColor: '#f9fafb' }}>
+            <TableRow>
               <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
               <TableCell sx={{ fontWeight: 600 }}>Description</TableCell>
               <TableCell sx={{ fontWeight: 600 }} align="right">

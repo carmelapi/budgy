@@ -1,48 +1,31 @@
 import { Link, useLocation } from "react-router-dom";
+import SpaceDashboardRounded from "@mui/icons-material/SpaceDashboardRounded";
+import ArrowDownwardRounded from "@mui/icons-material/ArrowDownwardRounded";
+import ArrowUpwardRounded from "@mui/icons-material/ArrowUpwardRounded";
 import { useTranslation } from "../hooks/useTranslation";
 
 export default function Sidebar() {
-  const location = useLocation();
+  const { pathname } = useLocation();
   const { t } = useTranslation();
-
-  const isActive = (path: string): boolean => {
-    return location.pathname === path;
-  };
+  const links = [
+    { path: "/dashboard", label: t.sidebar.dashboard, Icon: SpaceDashboardRounded },
+    { path: "/incomes", label: t.sidebar.incomes, Icon: ArrowDownwardRounded },
+    { path: "/outcomes", label: t.sidebar.outcomes, Icon: ArrowUpwardRounded },
+  ];
 
   return (
-    <div className="bg-gray-100 flex flex-col w-1/6 p-4 gap-2">
-      <Link
-        to="/dashboard"
-        className={`px-4 py-3 rounded-lg transition-colors ${
-          isActive("/dashboard")
-            ? "bg-blue-600 text-white font-semibold"
-            : "text-gray-700 hover:bg-gray-200"
-        }`}
-      >
-        {t.sidebar.dashboard}
-      </Link>
-
-      <Link
-        to="/incomes"
-        className={`px-4 py-3 rounded-lg transition-colors ${
-          isActive("/incomes")
-            ? "bg-blue-600 text-white font-semibold"
-            : " text-gray-700 hover:bg-gray-200"
-        }`}
-      >
-        {t.sidebar.incomes}
-      </Link>
-
-      <Link
-        to="/outcomes"
-        className={`px-4 py-3 rounded-lg transition-colors ${
-          isActive("/outcomes")
-            ? "bg-blue-600 text-white font-semibold"
-            : "text-gray-700 hover:bg-gray-200"
-        }`}
-      >
-        {t.sidebar.outcomes}
-      </Link>
-    </div>
+    <nav className="app-sidebar" aria-label="Budget">
+      {links.map(({ path, label, Icon }) => (
+        <Link
+          key={path}
+          to={path}
+          aria-current={pathname === path ? "page" : undefined}
+          className={`sidebar-link ${pathname === path ? "is-active" : ""}`}
+        >
+          <Icon fontSize="small" />
+          <span>{label}</span>
+        </Link>
+      ))}
+    </nav>
   );
 }

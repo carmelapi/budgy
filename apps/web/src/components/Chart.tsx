@@ -1,3 +1,4 @@
+import { useBudget } from "../context/BudgetContext";
 import { useState, useEffect, useCallback } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { CircularProgress, Paper } from "@mui/material";
@@ -48,14 +49,13 @@ const getPreviousMonth = (month: string): string => {
 
 export default function Chart() {
   const { t } = useTranslation();
+  const { budgetVersion } = useBudget();
   const [loading, setLoading] = useState(true);
   const [months, setMonths] = useState<string[]>([]);
   const [totalAccounts, setTotalAccounts] = useState<number[]>([]);
 
   const fetchData = useCallback(async () => {
     try {
-      setLoading(true);
-
       const [incomesRes, outcomesRes, fixedCostsRes, balancesRes] =
         await Promise.all([
           api.get("/api/incomes"),
@@ -119,7 +119,7 @@ export default function Chart() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [fetchData, budgetVersion]);
 
   if (loading) {
     return (

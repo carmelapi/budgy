@@ -1,16 +1,75 @@
+@import "tailwindcss";
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
-  color: #213547;
-  background-color: #f5f7fa;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  color: #1c1c1e;
+  background: #f2f2f7;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-body {
-  margin: 0;
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button, a, input { -webkit-tap-highlight-color: transparent; }
+a:focus-visible, button:focus-visible { outline: 3px solid #007aff; outline-offset: 3px; }
+h1 { font-size: 30px; font-weight: 700; line-height: 1.2; letter-spacing: -0.045em; }
+h2 { letter-spacing: -0.025em; }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.app-shell { height: 100dvh; display: flex; flex-direction: column; }
+.app-navbar {
+  min-height: 80px;
+  padding: 18px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid rgba(60, 60, 67, 0.08);
+  z-index: 10;
+}
+.app-logo { width: auto; height: 32px; max-width: 130px; }
+.navbar-actions { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.account-button { color: #6c6c70; font-size: 13px; cursor: pointer; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-button:hover { color: #007aff; }
+.app-body { display: flex; flex: 1; min-height: 0; }
+.app-sidebar { width: 220px; flex-shrink: 0; padding: 28px 16px; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid rgba(60, 60, 67, 0.06); }
+.sidebar-link { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: 13px; color: #636366; font-size: 14px; font-weight: 500; transition: background 150ms, color 150ms; }
+.sidebar-link svg { color: #8e8e93; }
+.sidebar-link:hover { background: #e8e8ef; }
+.sidebar-link.is-active { color: #007aff; background: #e4edff; font-weight: 650; }
+.sidebar-link.is-active svg { color: #007aff; }
+.app-main { flex: 1; min-width: 0; overflow: auto; }
+.page-content { display: flex; flex-direction: column; gap: 28px; padding: 36px 40px 56px; width: 100%; max-width: 1440px; margin: 0 auto; }
+.page-content h1 { margin-bottom: 4px; }
+.page-content h2 { font-size: 18px; font-weight: 650; color: #1c1c1e; margin: 0 0 16px 4px; }
+.page-content .MuiPaper-root { background-image: none; }
+.page-content .MuiTableCell-head { font-weight: 600; color: #6c6c70; }
+.page-content .MuiTableCell-alignRight { white-space: nowrap; }
+.login-page { min-height: 100dvh; display: flex; justify-content: center; align-items: center; padding: 24px; }
+.login-card { display: flex; flex-direction: column; align-items: center; gap: 24px; width: min(100%, 420px); padding: 36px; border-radius: 28px; background: white; border: 1px solid rgba(60, 60, 67, 0.06); box-shadow: 0 20px 60px rgba(28, 28, 30, 0.06); }
+
+@media (max-width: 900px) {
+  .app-sidebar { width: 180px; padding: 24px 12px; }
+  .page-content { padding: 28px 24px 40px; }
+  .account-button { max-width: 180px; }
+}
+@media (max-width: 640px) {
+  .app-navbar { min-height: 72px; padding: 14px 16px; gap: 12px; flex-wrap: wrap; }
+  .app-logo { height: 26px; max-width: 90px; }
+  .navbar-actions { gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .navbar-actions .MuiButton-root { min-width: 0; min-height: 38px; padding: 8px 12px; font-size: 12px; }
+  .account-button { max-width: 120px; font-size: 11px; }
+  .app-body { flex-direction: column; }
+  .app-sidebar { width: 100%; flex-direction: row; padding: 12px; gap: 4px; border-right: 0; border-bottom: 1px solid rgba(60, 60, 67, 0.06); }
+  .sidebar-link { flex: 1; justify-content: center; gap: 7px; padding: 11px 8px; font-size: 12px; }
+  .sidebar-link svg { font-size: 17px; }
+  .page-content { padding: 24px 16px 40px; gap: 24px; }
+  .page-content h1 { font-size: 28px; }
+  .page-content .MuiTableCell-root { padding: 16px 18px; }
+  .login-card { padding: 28px 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }

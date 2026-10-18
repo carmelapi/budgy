@@ -16,12 +16,15 @@ export const getById = async (userId, id) => {
   return result.rows[0] || null;
 };
 
-export const create = async (userId, { month, salary, extra }) => {
-  const result = await pool.query(
+export const create = async (userId, { month, salary, extra }, db = pool) => {
+  const result = await db.query(
     `INSERT INTO incomes (user_id, month, salary, extra)
-     VALUES ($1, $2, $3, $4)
+     VALUES ($1, $2, COALESCE($3::numeric, 0), COALESCE($4::numeric, 0))
+     ON CONFLICT (user_id, month) DO UPDATE SET
+       salary = CASE WHEN $3::numeric IS NULL THEN incomes.salary ELSE EXCLUDED.salary END,
+       extra = CASE WHEN $4::numeric IS NULL THEN incomes.extra ELSE EXCLUDED.extra END
      RETURNING *`,
-    [userId, month, salary, extra]
+    [userId, month, salary ?? null, extra ?? null]
   );
   return result.rows[0];
 };
