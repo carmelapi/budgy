@@ -1,7 +1,3 @@
-Carmela, questo NON è "molto semplice"! 😱
-Guardando il codice hai costruito:
-Frontend:
-
 React 19 + TypeScript + Vite
 Tailwind CSS + MUI
 React Router
